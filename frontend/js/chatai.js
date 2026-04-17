@@ -222,12 +222,22 @@ window.renderSavedPage = function () {
         grid.style.display = "none";
     } else {
         empty.style.display = "none";
-        grid.style.display = "grid";
+        
+        // Đoạn này cực kỳ quan trọng: ép hiển thị dạng lưới
+        grid.style.display = "grid"; 
+        
         grid.innerHTML = saved.map(p => `
             <div class="saved-item">
-                <img src="${p.imgSrc}">
-                <button class="heart-btn active" onclick="removeSavedPlace('${p.name}')"><i class='bx bxs-heart'></i></button>
-                <div class="item-desc"><h3>${p.name}</h3><p>${p.location}</p></div>
+                <img src="${p.imgSrc}" alt="${p.name}">
+                
+                <button class="heart-btn" onclick="removeSavedPlace(\`${p.name}\`)">
+                    <i class='bx bxs-heart'></i>
+                </button>
+                
+                <div class="item-desc">
+                    <h3>${p.name}</h3>
+                    <p>${p.location}</p>
+                </div>
             </div>`).join('');
     }
 };
@@ -243,8 +253,17 @@ window.removeSavedPlace = function (name) {
 // 5. KHỞI TẠO HỆ THỐNG (DOM LOADED)
 // =============================================================
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Khởi tạo Map
+document.addEventListener("DOMContentLoaded", async function () {
+// 1. Gọi API để lấy Key từ Backend
+    try {
+        const configRes = await fetch("http://127.0.0.1:5000/api/config");
+        const configData = await configRes.json();
+        mapboxgl.accessToken = configData.mapbox_token; // Nạp key xịn từ .env vào đây
+    } catch (err) {
+        console.error("Không lấy được Mapbox Token từ Backend!");
+    }
+
+    // 2. Sau khi có Key rồi mới khởi tạo Map
     map = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/satellite-streets-v12",

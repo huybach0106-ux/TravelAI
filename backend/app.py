@@ -8,10 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # Khởi tạo Groq Client
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-
+@app.route('/api/config')
+def get_config():
+    return jsonify({"mapbox_token": os.environ.get("MAPBOX_TOKEN")})
 @app.route('/api/search', methods=['POST'])
 def search_places():
     try:

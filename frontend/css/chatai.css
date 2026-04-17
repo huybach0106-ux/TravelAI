@@ -337,10 +337,174 @@ input:checked + .slider:before { transform: translateX(18px); }
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Lưới hiển thị khi có địa điểm đã lưu */
+/* ================= BỘ SƯU TẬP (SAVED) - CENTRALIZED ================= */
+
+/* 1. Mở khóa cuộn trang */
+html, body {
+    height: auto !important;
+    overflow-y: auto !important;
+}
+
+#view-saved {
+    padding: 40px 60px; /* Tạo khoảng trắng rộng rãi như trong ảnh */
+    background: #fff;
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Container nội dung tổng thể - Căn giữa toàn bộ */
+.saved-page {
+    max-width: 1200px;
+    margin: 0 auto; /* Căn giữa chiều ngang */
+    width: 100%;
+}
+
+/* 2. Tiêu đề chính */
+.saved-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+    text-align: left; /* Tiêu đề vẫn căn trái trong container trung tâm */
+}
+
+/* 3. Thanh Tab */
+.saved-tabs {
+    border-bottom: 1px solid #ebebeb;
+    margin-bottom: 40px;
+    text-align: left; /* Tab vẫn căn trái trong container trung tâm */
+}
+
+.saved-tab.active {
+    display: inline-block;
+    padding-bottom: 15px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #000;
+    border-bottom: 3px solid #222; /* Gạch chân đậm như hình */
+    cursor: pointer;
+}
+
+/* Container chính chứa cả trạng thái trống và lưới ảnh */
+#saved-container {
+    width: 100%;
+}
+
+/* 4. Căn giữa chiều dọc và chiều ngang cho trạng thái trống (Empty State) */
+/* Sử dụng flex box trên container khi ở trạng thái trống */
+#saved-container:has(.empty-state) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;;
+    min-height: calc(100vh - 200px); /* Tùy chỉnh chiều cao trung tâm */
+    text-align: center;
+}
+
+.empty-state {
+    max-width: 500px; /* Giới hạn chiều rộng cho trạng thái trống */
+    width: 100%;
+}
+
+/* Icon Gradient tròn */
+.icon-gradient-circle {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); /* Màu xanh lá mạ như hình */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-left: auto; /* Căn giữa icon */
+    margin-right: auto;
+}
+
+.icon-gradient-circle i {
+    font-size: 45px;
+    color: #fff;
+}
+
+.mini-heart {
+    position: absolute;
+    top: 30px;
+    font-size: 10px;
+    color: #ff385c;
+    background: #fff;
+    padding: 2px 4px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.empty-state h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: #717171; /* Màu xám nhẹ của AirBnb */
+    line-height: 1.4;
+}
+
+/* 5. Lưới hiển thị ảnh (Dành cho lúc có dữ liệu) */
 .saved-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-    padding-bottom: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+/* Style cho các card ảnh (giữ nguyên logic cũ nhưng làm gọn hơn) */
+.saved-item {
+    position: relative;
+    height: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.saved-item img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* Nút tim */
+.heart-btn {
+    position: absolute;
+    top: 15px; right: 15px;
+    z-index: 10;
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.heart-btn i {
+    color: #FF385C;
+    font-size: 20px;
+}
+
+.saved-item .item-desc {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 40px 20px 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #fff;
+    z-index: 5;
 }

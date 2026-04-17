@@ -338,105 +338,28 @@
           <div id="map" style="width: 100%; height: 100%"></div>
         </div>
       </div>
-      <section
-        id="view-saved"
-        class="view-section"
-        style="
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          height: 100vh;
-          background: #fff;
-          overflow: hidden;
-        "
-      >
-        <div
-          style="
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-          "
-        >
-          <h1
-            style="
-              font-size: 32px;
-              font-weight: 700;
-              margin-bottom: 30px;
-              color: #000;
-            "
-          >
-            Bộ sưu tập của bạn
-          </h1>
+<section id="view-saved" class="view-section">
+    <div class="saved-page">
+        <h1 class="saved-title">Bộ sưu tập của bạn</h1>
 
-          <div style="margin-bottom: 40px; border-bottom: 1px solid #f0f0f0">
-            <span
-              style="
-                font-weight: 600;
-                font-size: 16px;
-                padding-bottom: 12px;
-                border-bottom: 2px solid #000;
-                display: inline-block;
-                cursor: pointer;
-              "
-            >
-              Bộ sưu tập
-            </span>
-          </div>
+        <div class="saved-tabs">
+            <span class="saved-tab active">Bộ sưu tập</span>
+        </div>
 
-          <div
-            id="saved-container"
-            style="
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              overflow-y: auto;
-            "
-          >
-            <div
-              class="empty-state"
-              style="
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                padding-bottom: 100px;
-              "
-            >
-              <div class="icon-gradient-circle">
-                <i class="bx bx-grid-alt"></i>
-                <div class="mini-heart">❤</div>
-              </div>
-              <h2
-                style="
-                  font-size: 20px;
-                  font-weight: 700;
-                  margin-bottom: 12px;
-                  color: #111;
-                "
-              >
-                Thêm bộ sưu tập nào!
-              </h2>
-              <p
-                style="
-                  color: #666;
-                  font-size: 15px;
-                  max-width: 400px;
-                  line-height: 1.5;
-                "
-              >
-                Lưu các bộ sưu tập chuyến đi của bạn để tiết kiệm thời gian lên
-                lịch!
-              </p>
+        <div id="saved-container">
+            <div class="empty-state">
+                <div class="icon-gradient-circle">
+                    <i class='bx bx-map-alt'></i>
+                    <div class="mini-heart">❤</div>
+                </div>
+                <h2>Thêm bộ sưu tập nào!</h2>
+                <p>Lưu các bộ sưu tập chuyến đi của bạn để tiết kiệm thời gian lên lịch!</p>
             </div>
 
-            <div class="saved-grid" style="display: none"></div>
-          </div>
+            <div class="saved-grid"></div>
         </div>
-      </section>
+    </div>
+</section>
     </div>
     <div id="wiki-overlay" class="wiki-overlay">
       <button class="close-wiki-btn" onclick="closeWiki()">
