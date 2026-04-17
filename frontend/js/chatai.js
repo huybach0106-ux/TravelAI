@@ -1,6 +1,10 @@
 // =============================================================
 // 1. CẤU HÌNH & BIẾN TOÀN CỤC (GLOBAL VARIABLES)
 // =============================================================
+
+// THAY CÁI LINK NÀY BẰNG LINK TRÊN RENDER CỦA BẠN NHÉ
+const BASE_URL = "https://travelai-w3bg.onrender.com"; 
+
 mapboxgl.accessToken = "MAPBOX_TOKEN";
 
 let map;
@@ -42,7 +46,8 @@ window.sendMessage = async function (text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/chat", {
+        // Thay link localhost bằng BASE_URL
+        const response = await fetch(`${BASE_URL}/api/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text }),
@@ -50,7 +55,7 @@ window.sendMessage = async function (text) {
         const data = await response.json();
         document.getElementById(loadingId).innerHTML = data.response.replace(/\n/g, "<br>");
     } catch (err) {
-        document.getElementById(loadingId).innerText = "Lỗi kết nối tới Backend AI!";
+        document.getElementById(loadingId).innerText = "Lỗi kết nối tới AI! (Lưu ý: Server Free có thể mất 1 phút để khởi động lại)";
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
@@ -73,7 +78,7 @@ function appendBubble(sender, text, id = "") {
 
     const bubble = document.createElement("div");
     if (id) bubble.id = id;
-    bubble.style.cssText = "max-width: 85%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px;";
+    bubble.style.cssText = "max-width: 85%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px; margin-bottom: 10px;";
 
     if (isUser) {
         bubble.style.backgroundColor = "#f4f4f4";
@@ -138,7 +143,6 @@ function renderData(data, keyword) {
             .addTo(map);
         currentMarkers.push(marker);
 
-        // Load ảnh Wikipedia dự phòng
         const bulletproofFallback = `https://placehold.co/600x600/eeeeee/333333?text=${encodeURIComponent(p.name.substring(0, 18))}`;
         fetch(`https://vi.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(p.name)}&gsrlimit=1&prop=pageimages&pithumbsize=800&format=json&origin=*`)
             .then(res => res.json())
@@ -167,16 +171,17 @@ window.openPlaceDetail = function (index) {
     }
     overlay.style.display = "flex";
 
-    wikiContent.innerHTML = `<h1>${p.name}</h1><div style="text-align: center; padding: 50px;"><i class='bx bx-loader-alt bx-spin' style="font-size: 45px; color: #FF385C;"></i><p>Đang soạn cẩm nang AI...</p></div>`;
+    wikiContent.innerHTML = `<h1>${p.name}</h1><div style="text-align: center; padding: 50px;"><i class='bx bx-loader-alt bx-spin' style="font-size: 45px; color: #FF385C;"></i><p>AI đang viết cẩm nang...</p></div>`;
 
-    fetch("http://127.0.0.1:5000/api/guide", {
+    // Thay link localhost bằng BASE_URL
+    fetch(`${BASE_URL}/api/guide`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ place_name: p.name, location: p.location }),
     })
     .then(res => res.json())
     .then(data => { wikiContent.innerHTML = `<h1>${p.name}</h1>` + data.guide; })
-    .catch(() => { wikiContent.innerHTML = `<h1>${p.name}</h1><p>Lỗi kết nối Backend!</p>`; });
+    .catch(() => { wikiContent.innerHTML = `<h1>${p.name}</h1><p>Không kết nối được server!</p>`; });
 
     map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: 16, pitch: 60, speed: 1.5 });
 };
@@ -222,18 +227,14 @@ window.renderSavedPage = function () {
         grid.style.display = "none";
     } else {
         empty.style.display = "none";
-        
-        // Đoạn này cực kỳ quan trọng: ép hiển thị dạng lưới
         grid.style.display = "grid"; 
         
         grid.innerHTML = saved.map(p => `
             <div class="saved-item">
                 <img src="${p.imgSrc}" alt="${p.name}">
-                
                 <button class="heart-btn" onclick="removeSavedPlace(\`${p.name}\`)">
                     <i class='bx bxs-heart'></i>
                 </button>
-                
                 <div class="item-desc">
                     <h3>${p.name}</h3>
                     <p>${p.location}</p>
@@ -254,16 +255,16 @@ window.removeSavedPlace = function (name) {
 // =============================================================
 
 document.addEventListener("DOMContentLoaded", async function () {
-// 1. Gọi API để lấy Key từ Backend
+    // 1. Lấy Config từ BASE_URL
     try {
-        const configRes = await fetch("http://127.0.0.1:5000/api/config");
+        const configRes = await fetch(`${BASE_URL}/api/config`);
         const configData = await configRes.json();
-        mapboxgl.accessToken = configData.mapbox_token; // Nạp key xịn từ .env vào đây
+        mapboxgl.accessToken = configData.mapbox_token; 
     } catch (err) {
-        console.error("Không lấy được Mapbox Token từ Backend!");
+        console.error("Lỗi lấy Token từ server!");
     }
 
-    // 2. Sau khi có Key rồi mới khởi tạo Map
+    // 2. Khởi tạo Map
     map = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -288,28 +289,27 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 
-    // Search Input Explore
+    // Search API
     const searchInput = document.getElementById("map-search-input");
     if (searchInput) {
         searchInput.addEventListener("keypress", async (e) => {
             if (e.key === "Enter") {
                 const keyword = e.target.value.trim();
                 if (!keyword) return;
-                document.getElementById("explore-title").innerHTML = `Đang hỏi AI... <i class='bx bx-loader bx-spin'></i>`;
+                document.getElementById("explore-title").innerHTML = `AI đang tìm... <i class='bx bx-loader bx-spin'></i>`;
                 try {
-                    const res = await fetch("http://127.0.0.1:5000/api/search", {
+                    const res = await fetch(`${BASE_URL}/api/search`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ keyword })
                     });
                     const data = await res.json();
                     renderData(data, keyword);
-                } catch (err) { alert("Lỗi kết nối Backend!"); }
+                } catch (err) { alert("Server đang bận hoặc đang khởi động lại!"); }
             }
         });
     }
 
-    // Chat Input Enter
     const chatInput = document.getElementById("chat-input");
     if (chatInput) {
         chatInput.addEventListener("keypress", (e) => {
