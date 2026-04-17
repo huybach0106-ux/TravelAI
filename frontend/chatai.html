@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TravelAI - Trợ lý hướng dẫn du lịch cho bạn !</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/chatai.css" />
+    <script src="js/chatai.js" defer></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="logo">TravelAI</div>
+
+        <ul class="nav-menu">
+          <li class="active" data-target="view-chat">
+            <i class="bx bxs-message-rounded-dots"></i> Đoạn chat
+          </li>
+          <li data-target="view-trips">
+            <i class="bx bx-briefcase"></i> Chuyến đi
+          </li>
+          <li data-target="view-explore">
+            <i class="bx bx-search"></i> Khám phá
+          </li>
+          <li data-target="view-saved"><i class="bx bx-heart"></i> Lưu trữ</li>
+          <li data-target="view-notifications">
+            <i class="bx bx-bell"></i> Thông báo
+          </li>
+          <li data-target="view-suggestions">
+            <i class="bx bx-send"></i> Gợi ý
+          </li>
+        </ul>
+
+        <button class="btn-new-chat-sidebar" onclick="resetChat()">
+          New chat
+        </button>
+
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar"><i class="bx bxs-user"></i></div>
+            <div class="user-info">
+              <span class="name">Traveler</span>
+            </div>
+            <i class="bx bx-dots-horizontal-rounded more-options"></i>
+          </div>
+          <div class="footer-links">
+            Company · Contact · Help<br />
+            Terms · Privacy<br />
+            © 2026 TravelAI, Inc.
+          </div>
+        </div>
+      </aside>
+
+      <div id="view-chat" class="view-section" style="display: flex">
+        <main
+          class="main-chat"
+          style="
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+          "
+        >
+          <header class="chat-header" style="flex-shrink: 0">
+            <div class="header-title">New chat</div>
+            <div class="chat-filters">
+              <span class="filter-item">Where</span>
+              <span class="filter-item">When</span>
+              <span class="filter-item active">1 traveler</span>
+              <span class="filter-item">Budget</span>
+            </div>
+          </header>
+
+          <div
+            class="chat-content"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              overflow: hidden;
+              position: relative;
+            "
+          >
+            <div
+              class="welcome-section"
+              id="welcome-screen"
+              style="overflow-y: auto"
+            >
+              <img
+                src="assets/images/chatai/Anhai.png"
+                alt="Travel"
+                class="welcome-img"
+              />
+              <h1>Bạn muốn đi đâu hôm nay?</h1>
+              <p>
+                Tôi ở đây để hướng dẫn du lịch giúp bạn!<br />Bắt đầu chuyến đi
+                nào!
+              </p>
+            </div>
+
+            <div
+              id="chat-messages"
+              style="
+                display: none;
+                flex: 1;
+                overflow-y: auto;
+                padding: 20px;
+                flex-direction: column;
+                gap: 24px;
+              "
+            ></div>
+          </div>
+
+          <div class="chat-input-area" style="flex-shrink: 0">
+            <div class="suggestion-pill-wrapper" id="suggestion-wrapper">
+              <span
+                class="suggestion-pill"
+                onclick="sendMessage('Cách dùng TravelAI hiệu quả ?')"
+                style="cursor: pointer"
+              >
+                Cách dùng TravelAI hiệu quả ?
+              </span>
+            </div>
+
+            <div class="input-box">
+              <button class="icon-btn"><i class="bx bx-plus"></i></button>
+              <input
+                type="text"
+                id="chat-input"
+                placeholder="Ask anything"
+                autofocus
+              />
+              <button class="icon-btn" onclick="triggerSend()">
+                <i class="bx bx-send"></i>
+              </button>
+            </div>
+
+            <div class="disclaimer">
+              <i class="bx bx-info-circle"></i> TravelAI can make mistakes.
+              Check important info.
+            </div>
+          </div>
+        </main>
+
+        <aside class="right-panel">
+          <div class="panel-section">
+            <div class="section-header">
+              <h2>
+                Dành cho bạn
+                <span class="location-pill"
+                  ><i class="bx bx-map-pin"></i> TP Hồ Chí Minh</span
+                >
+                <button class="btn-map"><i class="bx bx-map"></i> Map</button>
+              </h2>
+              <span class="view-all">Khám phá</span>
+            </div>
+            <div class="cards-grid-small">
+              <div class="card-small">
+                <img src="assets/images/chatai/dinhdoclap.jpg" />
+                <div class="card-overlay">
+                  <h3>Dinh Độc Lập</h3>
+                  <p><i class="bx bx-building-house"></i> Thu Hút</p>
+                </div>
+              </div>
+              <div class="card-small">
+                <img src="assets/images/chatai/phole.jpg" />
+                <div class="card-overlay">
+                  <h3>Pho Le</h3>
+                  <p><i class="bx bx-restaurant"></i> Ẩm Thực</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-header">
+              <h2>Đã tìm kiếm</h2>
+            </div>
+            <div class="cards-grid-small">
+              <div class="card-small">
+                <img src="assets/images/chatai/hanoi1990s.png" />
+                <div class="card-overlay"><h3>Hà Nội 1990s</h3></div>
+              </div>
+              <div class="card-small">
+                <img src="assets/images/chatai/nha-hat-opera-ha-noi.png" />
+                <div class="card-overlay"><h3>Nhà hát opera Hà Nội</h3></div>
+              </div>
+            </div>
+
+            <div class="section-header" style="margin-top: 24px">
+              <h2>Gợi ý</h2>
+              <span class="view-all">Xem tất cả</span>
+            </div>
+            <div class="cards-grid-small">
+              <div class="card-small">
+                <img src="assets/images/chatai/du-lich-mien-nam.png" />
+                <div class="card-overlay"><h3>Du lịch miền Nam</h3></div>
+              </div>
+              <div class="card-small">
+                <img src="assets/images/chatai/diemdaopho.jpeg" />
+                <div class="card-overlay"><h3>Điểm dạo phố đẹp</h3></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div
+        id="view-trips"
+        class="view-section"
+        style="display: none; flex-direction: column; padding: 40px"
+      >
+        <div class="trips-header">
+          <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 24px">
+            Chuyến đi của bạn
+          </h1>
+          <div
+            class="trips-controls"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div
+              class="toggle-wrapper"
+              style="display: flex; align-items: center; gap: 10px"
+            >
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider round"></span>
+              </label>
+              <span style="font-size: 15px; font-weight: 500">Đã đặt</span>
+            </div>
+            <div
+              class="dropdown-filter"
+              style="font-size: 14px; color: #111; cursor: pointer"
+            >
+              Tất cả <i class="bx bx-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+        <div class="empty-state" style="flex: 1">
+          <div class="gradient-circle"><i class="bx bx-briefcase"></i></div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px">
+            Chưa có chuyến đi nào!
+          </h2>
+          <button
+            onclick="window.location.href = 'chatai.html'"
+            style="
+              padding: 14px 32px;
+              background: #111;
+              color: #fff;
+              border: none;
+              border-radius: 30px;
+              font-size: 16px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            "
+          >
+            Tạo chuyến đi của bạn ngay bây giờ
+          </button>
+
+          <style>
+            button[onclick*="chatai.html"]:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+              background: #333 !important;
+            }
+          </style>
+        </div>
+      </div>
+
+      <div id="view-explore" class="view-section" style="display: none">
+        <div class="explore-main">
+          <div class="explore-header">
+            <h1 id="explore-title">
+              Khám phá <i class="bx bx-chevron-down"></i>
+            </h1>
+          </div>
+
+          <div class="explore-search-row">
+            <div class="search-box-explore">
+              <i class="bx bx-search"></i>
+              <input
+                type="text"
+                id="map-search-input"
+                placeholder="Hỏi AI địa điểm (VD: Đà Nẵng...)"
+              />
+            </div>
+            <button class="btn-filter">
+              <i class="bx bx-slider-alt"></i> Filters
+            </button>
+          </div>
+
+          <div class="explore-categories">
+            <span class="cat-pill active">Things to do</span>
+          </div>
+
+          <h2
+            id="category-title"
+            style="
+              margin-top: 8px;
+              font-size: 18px;
+              font-weight: 700;
+              padding: 0 24px;
+            "
+          >
+            Things To Do
+          </h2>
+          <div class="places-grid" id="places-grid-container">
+            <p
+              style="
+                color: #888;
+                font-size: 14px;
+                text-align: center;
+                margin-top: 20px;
+              "
+            >
+              Nhập một địa điểm để AI lên lịch trình...
+            </p>
+          </div>
+        </div>
+        <div class="explore-map-container">
+          <div id="map" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+      <section
+        id="view-saved"
+        class="view-section"
+        style="
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          height: 100vh;
+          background: #fff;
+          overflow: hidden;
+        "
+      >
+        <div
+          style="
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+          "
+        >
+          <h1
+            style="
+              font-size: 32px;
+              font-weight: 700;
+              margin-bottom: 30px;
+              color: #000;
+            "
+          >
+            Bộ sưu tập của bạn
+          </h1>
+
+          <div style="margin-bottom: 40px; border-bottom: 1px solid #f0f0f0">
+            <span
+              style="
+                font-weight: 600;
+                font-size: 16px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid #000;
+                display: inline-block;
+                cursor: pointer;
+              "
+            >
+              Bộ sưu tập
+            </span>
+          </div>
+
+          <div
+            id="saved-container"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              overflow-y: auto;
+            "
+          >
+            <div
+              class="empty-state"
+              style="
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding-bottom: 100px;
+              "
+            >
+              <div class="icon-gradient-circle">
+                <i class="bx bx-grid-alt"></i>
+                <div class="mini-heart">❤</div>
+              </div>
+              <h2
+                style="
+                  font-size: 20px;
+                  font-weight: 700;
+                  margin-bottom: 12px;
+                  color: #111;
+                "
+              >
+                Thêm bộ sưu tập nào!
+              </h2>
+              <p
+                style="
+                  color: #666;
+                  font-size: 15px;
+                  max-width: 400px;
+                  line-height: 1.5;
+                "
+              >
+                Lưu các bộ sưu tập chuyến đi của bạn để tiết kiệm thời gian lên
+                lịch!
+              </p>
+            </div>
+
+            <div class="saved-grid" style="display: none"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div id="wiki-overlay" class="wiki-overlay">
+      <button class="close-wiki-btn" onclick="closeWiki()">
+        <i class="bx bx-x"></i>
+      </button>
+
+      <div id="wiki-content" class="wiki-content">
+        Đang chờ AI tải dữ liệu...
+      </div>
+    </div>
+  </body>
+</html>
