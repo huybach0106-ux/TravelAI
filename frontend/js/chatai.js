@@ -1,7 +1,7 @@
 
 // 1. CẤU HÌNH & BIẾN TOÀN CỤC 
 
-const BASE_URL = "http://127.0.0.1:5000"; 
+const BASE_URL = "https://travelai-w3bg.onrender.com/"; 
 mapboxgl.accessToken = "MAPBOX_TOKEN";
 
 let map;
