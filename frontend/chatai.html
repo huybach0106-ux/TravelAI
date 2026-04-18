@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TravelAI - Trợ lý hướng dẫn du lịch cho bạn!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/chatai.css" />
+    <script src="js/chatai.js" defer></script>
+  </head>
+  <body>
+    <div class="app-container">
+      
+      <aside class="sidebar">
+        <div class="logo">TravelAI</div>
+        <nav class="sidebar-nav">
+          <ul class="nav-menu">
+            <li class="active" data-target="view-chat">
+              <i class="bx bxs-message-rounded-dots"></i> Đoạn chat
+            </li>
+            <li data-target="view-trips">
+              <i class="bx bx-briefcase"></i> Chuyến đi
+            </li>
+            <li data-target="view-explore">
+              <i class="bx bx-search"></i> Khám phá
+            </li>
+            <li data-target="view-saved">
+              <i class="bx bx-heart"></i> Lưu trữ
+            </li>
+            <li id="btn-show-noti">
+              <i class="bx bx-bell"></i> Thông báo
+            </li>
+            <li data-target="view-suggestions">
+              <i class="bx bx-send"></i> Gợi ý
+            </li>
+          </ul>
+        </nav>
+        <button class="btn-new-chat-sidebar" onclick="resetChat(); document.querySelector('[data-target=\'view-chat\']').click();">
+          New chat
+        </button>
+        <footer class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar"><i class="bx bxs-user"></i></div>
+            <div class="user-info"><span class="name">Van Huy Bach</span></div>
+            <i class="bx bx-dots-horizontal-rounded more-options"></i>
+          </div>
+          <div class="footer-links">
+            Company · Contact · Help<br />
+            Terms · Privacy<br />
+            © 2026 TravelAI, Inc.
+          </div>
+        </footer>
+      </aside>
+
+      <section id="view-chat" class="view-section active-view">
+        <main class="main-chat">
+          <header class="chat-header">
+            <div class="header-title">New chat</div>
+            <button class="btn-new-chat-header" onclick="resetChat();">
+              <i class="bx bx-edit"></i> New chat
+            </button>
+            <div class="chat-filters">
+              <span class="filter-item">Where</span>
+              <span class="filter-item">When</span>
+              <span class="filter-item active">1 traveler</span>
+              <span class="filter-item">Budget</span>
+            </div>
+          </header>
+          <div class="chat-content">
+            <div class="welcome-section" id="welcome-screen">
+              <img src="assets/images/chatai/Anhai.png" alt="Travel" class="welcome-img" />
+              <h1>Bạn muốn đi đâu hôm nay?</h1>
+              <p>Tôi ở đây để hướng dẫn du lịch giúp bạn!<br />Bắt đầu chuyến đi nào!</p>
+            </div>
+            <div id="chat-messages"></div>
+          </div>
+          <div class="chat-input-area">
+            <div class="suggestion-pill-wrapper" id="suggestion-wrapper">
+              <span class="suggestion-pill" onclick="sendMessage('Cách dùng TravelAI hiệu quả ?')">
+                Cách dùng TravelAI hiệu quả ?
+              </span>
+            </div>
+            <div class="input-box">
+              <button class="icon-btn"><i class="bx bx-plus"></i></button>
+              <input type="text" id="chat-input" placeholder="Ask anything" autofocus />
+              <button class="icon-btn" onclick="triggerSend()"><i class="bx bx-send"></i></button>
+            </div>
+            <div class="disclaimer">
+              <i class="bx bx-info-circle"></i> TravelAI can make mistakes. Check important info.
+            </div>
+          </div>
+        </main>
+
+        <aside class="right-panel">
+          <div class="panel-section">
+            <header class="section-header">
+              <h2>Dành cho bạn 
+                <button class="btn-map" onclick="document.querySelector('[data-target=\'view-explore\']').click()">
+                  <i class="bx bx-map"></i> Map
+                </button>
+              </h2>
+              <span class="view-all" onclick="document.querySelector('[data-target=\'view-explore\']').click()">Khám phá</span>
+            </header>
+            <div class="cards-grid-small">
+              <article class="card-small" onclick="sendMessage('Viết hướng dẫn chi tiết để tham quan Dinh Độc Lập nhé!')">
+                <img src="assets/images/chatai/dinhdoclap.jpg" alt="Dinh Độc Lập" />
+                <div class="card-overlay">
+                  <h3>Dinh Độc Lập</h3>
+                  <p><i class="bx bx-building-house"></i> Thu Hút</p>
+                </div>
+              </article>
+              <article class="card-small" onclick="sendMessage('Gợi ý cho tôi các món ngon khi đi ăn tại Phở Lệ')">
+                <img src="assets/images/chatai/phole.jpg" alt="Phở Lệ" />
+                <div class="card-overlay">
+                  <h3>Pho Le</h3>
+                  <p><i class="bx bx-restaurant"></i> Ẩm Thực</p>
+                </div>
+              </article>
+            </div>
+            <header class="section-header suggest-header">
+              <h2>Gợi ý</h2>
+              <span class="view-all" onclick="document.querySelector('[data-target=\'view-suggestions\']').click()">Xem tất cả</span>
+            </header>
+            <div class="cards-grid-small">
+              <article class="card-small" onclick="sendMessage('Lên lịch trình 1 ngày trải nghiệm tại nhà hàng Hà Nội 1990s')">
+                <img src="assets/images/chatai/hanoi1990s.png" alt="Hà Nội 1990s" />
+                <div class="card-overlay"><h3>Hà Nội 1990s</h3></div>
+              </article>
+              <article class="card-small" onclick="sendMessage('Giới thiệu về kiến trúc và lịch sử của Nhà hát Opera Hà Nội')">
+                <img src="assets/images/chatai/nha-hat-opera-ha-noi.png" alt="Nhà hát opera Hà Nội" />
+                <div class="card-overlay"><h3>Nhà hát opera Hà Nội</h3></div>
+              </article>
+            </div>
+            <div class="cards-grid-small">
+              <article class="card-small" onclick="sendMessage('Gợi ý lịch trình du lịch xuyên các tỉnh miền Nam trong 5 ngày')">
+                <img src="assets/images/chatai/du-lich-mien-nam.png" alt="Du lịch miền Nam" />
+                <div class="card-overlay"><h3>Du lịch miền Nam</h3></div>
+              </article>
+              <article class="card-small" onclick="sendMessage('Chỉ cho tôi những góc dạo phố, chụp ảnh check-in đẹp nhất')">
+                <img src="assets/images/chatai/diemdaopho.jpeg" alt="Điểm dạo phố đẹp" />
+                <div class="card-overlay"><h3>Điểm dạo phố đẹp</h3></div>
+              </article>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="view-trips" class="view-section">
+        <header class="trips-header">
+          <h1>Chuyến đi của bạn</h1>
+          <div class="trips-controls">
+            <div class="toggle-wrapper">
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-text">Đã đặt</span>
+            </div>
+            <div class="dropdown-filter">
+              Tất cả <i class="bx bx-chevron-down"></i>
+            </div>
+          </div>
+        </header>
+        <div class="empty-state">
+          <div class="gradient-circle"><i class="bx bx-briefcase"></i></div>
+          <h2>Chưa có chuyến đi nào!</h2>
+          <button class="btn-create-trip" onclick="document.querySelector('[data-target=\'view-chat\']').click()">
+            Tạo chuyến đi của bạn ngay bây giờ
+          </button>
+        </div>
+      </section>
+
+      <section id="view-explore" class="view-section">
+        <aside class="explore-main">
+          <header class="explore-header">
+            <h1 id="explore-title">Khám phá <i class="bx bx-chevron-down"></i></h1>
+          </header>
+          <div class="explore-search-row">
+            <div class="search-box-explore">
+              <i class="bx bx-map-pin"></i> 
+              <input type="text" id="map-search-input" placeholder="Hỏi AI địa điểm (VD: Đà Nẵng...)" />
+            </div>
+            <button class="btn-search-explore" onclick="triggerExploreSearch()">
+              Tìm kiếm
+            </button>
+          </div>
+          <nav class="explore-categories">
+            <span class="cat-pill active">Things to do</span>
+          </nav>
+          <h2 id="category-title">Things To Do</h2>
+          <div class="places-grid" id="places-grid-container">
+            <p class="empty-grid-msg">Nhập một địa điểm để AI lên lịch trình...</p>
+          </div>
+        </aside>
+        <div class="explore-map-container">
+          <div id="map"></div>
+        </div>
+      </section>
+
+      <section id="view-saved" class="view-section">
+        <div class="saved-page">
+          <h1 class="saved-title">Bộ sưu tập của bạn</h1>
+          <nav class="saved-tabs">
+            <span class="saved-tab active">Bộ sưu tập</span>
+          </nav>
+          <div id="saved-container">
+            <div class="empty-state">
+              <div class="icon-gradient-circle">
+                <i class="bx bx-map-alt"></i>
+                <div class="mini-heart">❤</div>
+              </div>
+              <h2>Thêm bộ sưu tập nào!</h2>
+              <p>Lưu các bộ sưu tập chuyến đi của bạn để tiết kiệm thời gian lên lịch!</p>
+            </div>
+            <div class="saved-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-suggestions" class="view-section">
+        <div class="suggestion-hero">
+          <div class="gradient-btn-plus"><i class="bx bx-plus"></i></div>
+          <h2>Gợi ý du lịch</h2>
+          <p>Tìm hiểu về những địa danh tuyệt đẹp tại Việt Nam.</p>
+          <button class="btn-create-guide" onclick="document.querySelector('[data-target=\'view-chat\']').click()">
+            Tìm hiểu cùng AI
+          </button>
+        </div>
+        <div class="marquee-container">
+          <div class="marquee-track">
+            <img src="assets/images/chatai/yenbai.png" alt="1" />
+            <img src="assets/images/chatai/tphcm.png" alt="2" />
+            <img src="assets/images/chatai/hanoi.png" alt="3" />
+            <img src="assets/images/chatai/nhatrang.avif" alt="4" />
+            <img src="assets/images/chatai/ninhbinh.png" alt="5" />
+            <img src="assets/images/chatai/bien.avif" alt="6" />
+            <img src="assets/images/chatai/thienduong.avif" alt="7" />
+            <img src="assets/images/chatai/phuquoc.avif" alt="8" />
+            <img src="assets/images/chatai/quangnam.png" alt="9" />
+            <img src="assets/images/chatai/quangninh.png" alt="10" />
+            <img src="assets/images/chatai/phongnha.avif" alt="11" />
+            <img src="assets/images/chatai/laocai.png" alt="12" />
+            <img src="assets/images/chatai/khanhhoa.png" alt="13" />
+            <img src="assets/images/chatai/hue.png" alt="14" />
+            <img src="assets/images/chatai/daiduong.avif" alt="15" />
+          </div>
+        </div>
+      </section>
+    </div> <div id="wiki-overlay" class="wiki-overlay">
+      <button class="close-wiki-btn" onclick="closeWiki()"><i class="bx bx-x"></i></button>
+      <div id="wiki-content" class="wiki-content">Đang chờ AI tải dữ liệu...</div>
+    </div>
+
+    <aside id="view-notifications-panel" class="noti-panel">
+      <header class="noti-header">
+        <div class="noti-title">Cập nhật <span class="noti-badge">0</span></div>
+        <div class="noti-actions">
+          <span>Chưa đọc</span>
+          <label class="mini-switch">
+            <input type="checkbox" />
+            <span class="mini-slider"></span>
+          </label>
+          <i class="bx bx-dots-horizontal-rounded"></i>
+        </div>
+      </header>
+      <nav class="noti-tabs"><span class="noti-tab">Tất cả</span></nav>
+      <div class="noti-empty">
+        <div class="noti-bell-circle"><i class="bx bx-bell"></i></div>
+        <h3>Chưa có thông báo nào.</h3>
+      </div>
+    </aside>
+
+  </body>
+</html>
