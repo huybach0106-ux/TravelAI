@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelAI - Khám phá Việt Nam theo cách của bạn</title>
+    
+    <link rel="icon" type="image/png" href="assets/images/travelicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">TravelAI</div>
+            
+            <ul class="nav-links">
+                <li><a href="frontend/chatai.html?view=view-explore">Điểm đến</a></li>
+                <li><a href="frontend/chatai.html?view=view-suggestions">Gợi ý</a></li>
+                <li><a href="#">Về chúng tôi</a></li>
+            </ul>
+
+            <div class="nav-auth">
+                <button id="openLogin" class="btn-login">Đăng nhập</button>
+                <a href="frontend/chatai.html" class="btn-start" >Bắt đầu</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-left">
+                    <h2 class="anim-title">
+                        Travel <br>
+                        <span class="word-wrapper">
+                            <span class="word active">differently.</span>
+                            <span class="word">together.</span>
+                        </span>
+                    </h2>
+                    <p>Khám phá Việt Nam theo cách của riêng bạn!</p>
+                    <div class="hero-btns">
+                        <a href="frontend/chatai.html" class="cta-button">Bắt đầu ngay</a>
+                        <a href="#how-it-works" class="btn-text">Tìm hiểu thêm ➔</a>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <div class="image-grid">
+                        <img src="assets/images/ha-long.jpg" class="grid-img img-large" alt="Vịnh Hạ Long">
+                        <img src="assets/images/hoi-an.jpg" class="grid-img" alt="Phố cổ Hội An">
+                        <img src="assets/images/cau-vang.jpg" class="grid-img" alt="Cầu Vàng Đà Nẵng">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works">
+            <h2 class="section-title">Cách TravelAI hoạt động</h2>
+
+            <div class="feature-container">
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <h3>Trò chuyện cùng AI</h3>
+                        <p>Chia sẻ về điểm đến mơ ước hoặc phong cách du lịch của bạn. AI sẽ phân tích và thiết kế hành trình độc bản dành riêng cho bạn.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="assets/images/how-it-works.png" alt="Giao diện trò chuyện AI"> 
+                    </div>
+                </div>
+
+                <div class="feature-row reverse">
+                    <div class="feature-text">
+                        <h3>Địa danh nổi tiếng</h3>
+                        <p>Khám phá những điểm đến hấp dẫn nhất Việt Nam, được AI gợi ý chính xác dựa trên sở thích cá nhân.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="assets/images/diadanh.png" alt="Các địa danh nổi tiếng">
+                    </div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <h3>Cá nhân hóa trải nghiệm</h3>
+                        <p>Mỗi chuyến đi là một câu chuyện riêng. Chúng tôi đảm bảo mọi chi tiết đều phù hợp với nhu cầu của bạn.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="assets/images/image.png" alt="Trải nghiệm cá nhân hóa">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-promo">
+            <div class="promo-container">
+                <div class="promo-content">
+                    <h2>Để chúng tôi đồng hành<br>trên mọi hành trình!</h2>
+                    <p>Trải nghiệm ứng dụng TravelAI ngay trên điện thoại của bạn.</p>
+                </div>
+                <div class="promo-image">
+                    <img src="assets/images/anhdt.png" alt="TravelAI Mobile App">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="closeLogin" class="close-btn">&times;</span>
+            <h3>Đăng nhập TravelAI</h3>
+            <form class="login-form">
+                <div class="input-group">
+                    <label for="emailInput">Địa chỉ Email</label>
+                    <input type="email" id="emailInput" placeholder="Email của bạn..." required>
+                </div>
+                <p class="terms">Bằng cách tiếp tục, bạn đồng ý với <a href="#">Điều khoản</a> và <a href="#">Chính sách bảo mật</a> của chúng tôi.</p>
+                <button type="submit" id="loginBtn" class="btn-submit">Đăng nhập</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <span>© 2026 TravelAI, Inc.</span>
+                <a href="#">Bảo mật</a>
+                <a href="#">Điều khoản</a>
+            </div>
+
+            <div class="footer-right">
+                <a href="https://www.instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.tiktok.com" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="https://www.facebook.com" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://twitter.com" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://www.youtube.com" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a href="https://www.linkedin.com" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

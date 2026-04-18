@@ -1,7 +1,1 @@
 assets/images/
-backend/.env
-.env
-__pycache__/
-venv/
-*.pyc
-
