@@ -70,3 +70,15 @@ Backend: Python Flask.
 AI Model: Llama-based AI (Xử lý ngôn ngữ tự nhiên và gợi ý địa điểm).
 
 Icons & Fonts: FontAwesome, Boxicons, Google Fonts (Inter), Favicon.
+## 📚 Tài liệu tham khảo & Nguồn tài nguyên
+
+Dự án được hoàn thiện nhờ sự hỗ trợ từ các tài nguyên và thư viện mã nguồn mở sau:
+
+* **Trí tuệ nhân tạo (AI & LLM):**
+    * [Groq API Documentation](https://console.groq.com/docs/quickstart) - Cung cấp API xử lý ngôn ngữ tự nhiên (NLP) với tốc độ suy luận cực nhanh nhờ kiến trúc LPU.
+* **Bản đồ & Định vị (Maps & Location Services):** * [Mapbox GL JS API Documentation](https://docs.mapbox.com/mapbox-gl-js/api/) - Xử lý hiển thị bản đồ và tìm kiếm địa điểm.
+* **Giao diện & Đồ họa (UI & Graphics):**
+    * [Boxicons](https://boxicons.com/) - Thư viện icon mã nguồn mở, nhẹ và hiện đại.
+    * [Google Fonts (Inter)](https://fonts.google.com/specimen/Inter) - Font chữ chủ đạo giúp tối ưu khả năng đọc trên UI/UX.
+* **Công cụ phát triển (Development Tools):**
+    * [VS Code Live Server Extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) - Môi trường chạy thử nghiệm dự án Localhost.
