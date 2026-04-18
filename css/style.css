@@ -12,7 +12,7 @@ body { font-family: 'Inter', sans-serif; color: #000; overflow-x: hidden; backgr
 .nav-links a, .btn-login { font-size: 16px; font-weight: 500; color: #555; padding: 10px 22px; border-radius: 50px; transition: 0.2s ease; cursor: pointer; }
 .btn-login { background: transparent; border: none; font-weight: 600; color: #000; }
 .nav-links a:hover, .btn-login:hover { color: #000; background-color: rgba(0, 0, 0, 0.05); }
-.btn-start { background: #000; color: #fff; padding: 14px 28px; border-radius: 50px; font-weight: 600; font-size: 15px; transition: 0.2s ease; border: none; cursor: pointer;}
+.btn-start { display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 50px; font-weight: 600; font-size: 15px; transition: 0.2s ease; border: none; cursor: pointer;}
 .btn-start:hover { transform: scale(1.02); }
 
 /* ==========  3. HERO SECTION  ============= */

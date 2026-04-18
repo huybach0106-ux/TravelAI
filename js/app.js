@@ -38,13 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const initAuth = () => {
         const loginBtn = document.getElementById('loginBtn');
         const emailInput = document.getElementById('emailInput');
-        const isChatPage = window.location.pathname.includes('chatai.html');
+        const isChatPage = window.location.pathname.includes('frontend/chatai.html');
         const currentUser = localStorage.getItem('userEmail');
+
+       
         if (isChatPage && !currentUser) {
             window.location.href = 'index.html';
             return;
         }
 
+       
         if (loginBtn && emailInput) {
             loginBtn.onclick = (e) => {
                 e.preventDefault();
@@ -52,19 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (email) {
                     localStorage.setItem('userEmail', email);
-                    window.location.href = 'chatai.html';
+                    window.location.href = 'frontend/chatai.html';
                 } else {
                     alert("Cậu chưa nhập email kìa!");
                 }
             };
         }
     };
+
     initWordRotation();
     initModal();
     initAuth();
 });
-
-function logout() {
-    localStorage.removeItem('userEmail');
-    window.location.href = 'index.html';
-}
