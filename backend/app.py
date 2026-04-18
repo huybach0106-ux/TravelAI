@@ -19,45 +19,73 @@ def get_config():
 def search_places():
     try:
         data = request.get_json()
-        keyword = data.get('keyword')
+        keyword = data.get('keyword', 'Hà Nội')
         
-        # PROMPT MỚI: Ép AI trả địa chỉ chính xác tuyệt đối
-        prompt = f"""
-        Tìm 6 địa điểm du lịch nổi tiếng tại {keyword}. 
-        YÊU CẦU BẮT BUỘC:
-        1. Trường 'location' PHẢI LÀ ĐỊA CHỈ ĐƯỜNG THỰC TẾ VÀ CHÍNH XÁC (Ví dụ: Đền Ngọc Sơn phải là 'Đinh Tiên Hoàng, Hàng Trống, Hoàn Kiếm'). 
-        2. TUYỆT ĐỐI KHÔNG được bịa địa chỉ, không được ghi lặp lại chung chung kiểu "Phố cổ, Hoàn Kiếm".
-        3. Tên địa điểm ('name') phải là tên tiếng Việt chuẩn trên Wikipedia để hiển thị ảnh cho đúng.
-        
-        Trả về đúng định dạng JSON: 
-        {{"places": [{{"name": "Tên chuẩn", "lat": 21.0, "lng": 105.0, "rating": 4.8, "type": "Attraction", "location": "Số nhà, Tên đường, Quận, Thành phố"}}]}}
-        """
-        
+        # 1. Tách biệt System Prompt để định hình "tư duy" cho AI
+        system_prompt = """Bạn là một chuyên gia địa lý và du lịch Việt Nam. 
+Nhiệm vụ: Trích xuất thông tin địa danh chính xác tuyệt đối.
+Quy tắc:
+- 'location': Phải là địa chỉ đầy đủ (Số nhà, tên đường, phường, quận). Không được ghi chung chung.
+- 'name': Tên tiếng Việt chuẩn theo Wikipedia.
+- 'lat/lng': Phải là tọa độ thực tế (thập phân). 
+- Chỉ trả về JSON, không giải thích."""
+
+        # 2. Few-shot Prompting: Cho AI thấy 1 ví dụ mẫu để nó bắt chước theo
+        user_prompt = f"""Tìm 6 địa điểm du lịch nổi tiếng tại {keyword}. 
+
+Ví dụ mẫu cho 'Hà Nội':
+{{
+  "places": [
+    {{
+      "name": "Đền Ngọc Sơn",
+      "lat": 21.0307,
+      "lng": 105.8523,
+      "rating": 4.6,
+      "type": "Attraction",
+      "location": "Đinh Tiên Hoàng, Hàng Trống, Hoàn Kiếm, Hà Nội"
+    }}
+  ]
+}}
+
+Hãy thực hiện cho từ khóa: {keyword}"""
+
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.1 # Quan trọng: Để mức thấp để AI bớt "sáng tạo" địa chỉ bậy
         )
 
         res_data = json.loads(completion.choices[0].message.content)
         places = res_data.get('places', [])
 
-        # Kiểm tra an toàn để không bị lỗi 'lng'
+        # 3. Xử lý dữ liệu đầu ra sạch sẽ
         valid_places = []
         for p in places:
+            # Ưu tiên các key chuẩn, fallback nếu AI trả về tên khác
             lat = p.get('lat') or p.get('latitude')
             lng = p.get('lng') or p.get('longitude')
-            if lat and lng:
-                p['lat'] = lat
-                p['lng'] = lng
-                valid_places.append(p)
+            name = p.get('name')
+            loc = p.get('location')
+
+            if lat and lng and name and loc:
+                valid_places.append({
+                    "name": name,
+                    "lat": float(lat),
+                    "lng": float(lng),
+                    "rating": p.get('rating', 4.5),
+                    "type": p.get('type', 'Tourist Attraction'),
+                    "location": loc
+                })
 
         return jsonify({
-            "center": [valid_places[0]['lng'], valid_places[0]['lat']] if valid_places else None,
+            "center": [valid_places[0]['lng'], valid_places[0]['lat']] if valid_places else [105.85, 21.02],
             "places": valid_places
         })
     except Exception as e:
-        print(f"Lỗi: {e}")
         return jsonify({"error": str(e)}), 500
 @app.route('/api/guide', methods=['POST'])
 def get_travel_guide():
@@ -76,8 +104,9 @@ def get_travel_guide():
         3. Cách di chuyển đến đây thuận tiện nhất.
         4. Một vài lưu ý quan trọng (trang phục, vé vào cửa, hoặc mẹo nhỏ).
         
-        Lưu ý: Trả về nội dung bằng tiếng Việt. Hãy trình bày đẹp mắt bằng các thẻ HTML (h2, p, ul, li). 
-        Không cần thẻ <html> hay <body>, chỉ cần nội dung bên trong.
+        "Hãy trả về nội dung hoàn toàn bằng mã HTML. Dùng thẻ <h2> cho các tiêu đề chính. Dùng thẻ <ul> 
+        và <li> để liệt kê gạch đầu dòng. Các Mẹo du lịch hoặc Lưu ý quan trọng hãy đặt trong thẻ <blockquote>
+        để làm nổi bật. Đừng dùng Markdown, chỉ dùng HTML."
         """
 
         completion = client.chat.completions.create(

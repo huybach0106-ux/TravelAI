@@ -1,69 +1,78 @@
-// =============================================================
-// 1. CẤU HÌNH & BIẾN TOÀN CỤC (GLOBAL VARIABLES)
-// =============================================================
 
-// THAY CÁI LINK NÀY BẰNG LINK TRÊN RENDER CỦA BẠN NHÉ
-const BASE_URL = "https://travelai-w3bg.onrender.com"; 
+// 1. CẤU HÌNH & BIẾN TOÀN CỤC 
 
+const BASE_URL = "http://127.0.0.1:5000"; 
 mapboxgl.accessToken = "MAPBOX_TOKEN";
 
 let map;
 let currentMarkers = [];
 let currentPlacesData = [];
 
-// =============================================================
+const getSavedPlaces = () => JSON.parse(localStorage.getItem("travelai_saved") || "[]");
+const setSavedPlaces = (data) => localStorage.setItem("travelai_saved", JSON.stringify(data));
+
 // 2. CÁC HÀM XỬ LÝ CHAT AI
-// =============================================================
 
 window.resetChat = function () {
     const chatMessages = document.getElementById("chat-messages");
-    const welcomeScreen = document.getElementById("welcome-screen");
-    const suggestionWrapper = document.getElementById("suggestion-wrapper");
-    const chatInput = document.getElementById("chat-input");
-
     if (chatMessages) {
         chatMessages.innerHTML = "";
         chatMessages.style.display = "none";
     }
-    if (welcomeScreen) welcomeScreen.style.display = "block";
-    if (suggestionWrapper) suggestionWrapper.style.display = "flex";
-    if (chatInput) chatInput.value = "";
+    document.getElementById("welcome-screen").style.display = "block";
+    
+    const suggestionWrapper = document.getElementById("suggestion-wrapper");
+    if(suggestionWrapper) suggestionWrapper.style.display = "flex";
+    
+    document.getElementById("chat-input").value = "";
 };
 
 window.sendMessage = async function (text) {
-    const welcomeScreen = document.getElementById("welcome-screen");
+    // 1. CHUYỂN NGAY VỀ TAB CHAT 
+    document.querySelectorAll(".view-section").forEach(v => v.style.display = "none");
+    const viewChat = document.getElementById("view-chat");
+    if (viewChat) viewChat.style.display = "flex";
+
+    document.querySelectorAll(".nav-menu li").forEach(li => li.classList.remove("active"));
+    const chatTabBtn = document.querySelector(".nav-menu li[data-target='view-chat']");
+    if (chatTabBtn) chatTabBtn.classList.add("active");
+
+    // 2. XỬ LÝ LOGIC CHAT
     const chatMessages = document.getElementById("chat-messages");
+    document.getElementById("welcome-screen").style.display = "none";
+    
     const suggestionWrapper = document.getElementById("suggestion-wrapper");
-
-    if (welcomeScreen) welcomeScreen.style.display = "none";
-    if (chatMessages) chatMessages.style.display = "flex";
-    if (suggestionWrapper) suggestionWrapper.style.display = "none";
-
+    if(suggestionWrapper) suggestionWrapper.style.display = "none";
+    chatMessages.style.display = "flex";
     appendBubble("user", text);
-
     const loadingId = "loading-" + Date.now();
     appendBubble("ai", "<i class='bx bx-loader-alt bx-spin'></i> Đang suy nghĩ...", loadingId);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 50);
 
     try {
-        // Thay link localhost bằng BASE_URL
         const response = await fetch(`${BASE_URL}/api/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text }),
         });
         const data = await response.json();
-        document.getElementById(loadingId).innerHTML = data.response.replace(/\n/g, "<br>");
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) {
+            loadingEl.innerHTML = data.response.replace(/\n/g, "<br>");
+        }
     } catch (err) {
-        document.getElementById(loadingId).innerText = "Lỗi kết nối tới AI! (Lưu ý: Server Free có thể mất 1 phút để khởi động lại)";
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) {
+            loadingEl.innerText = "Lỗi kết nối tới AI! (Lưu ý: Server chưa bật hoặc bị sập)";
+        }
     }
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 50);
 };
 
 window.triggerSend = function () {
     const input = document.getElementById("chat-input");
     const val = input.value.trim();
-    if (val !== "") {
+    if (val) {
         window.sendMessage(val);
         input.value = "";
     }
@@ -71,7 +80,10 @@ window.triggerSend = function () {
 
 function appendBubble(sender, text, id = "") {
     const chatMessages = document.getElementById("chat-messages");
+    if (!chatMessages) return; // Chống lỗi nếu không tìm thấy DOM
+    
     const isUser = sender === "user";
+    
     const wrapper = document.createElement("div");
     wrapper.style.display = "flex";
     wrapper.style.justifyContent = isUser ? "flex-end" : "flex-start";
@@ -95,31 +107,49 @@ function appendBubble(sender, text, id = "") {
     chatMessages.appendChild(wrapper);
 }
 
-// =============================================================
 // 3. XỬ LÝ KHÁM PHÁ (MAP & PLACES)
-// =============================================================
+
+window.triggerExploreSearch = async function () {
+    const input = document.getElementById("map-search-input");
+    const keyword = input.value.trim();
+    if (!keyword) return;
+    
+    const exploreTitle = document.getElementById("explore-title");
+    if (exploreTitle) exploreTitle.innerHTML = `AI đang tìm... <i class='bx bx-loader bx-spin'></i>`;
+    
+    try {
+        const res = await fetch(`${BASE_URL}/api/search`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keyword })
+        });
+        renderData(await res.json(), keyword);
+    } catch (err) { 
+        alert("Server đang bận hoặc đang khởi động lại!"); 
+        if (exploreTitle) exploreTitle.innerHTML = `Khám phá <i class='bx bx-chevron-down'></i>`;
+    }
+};
 
 function renderData(data, keyword) {
     if (!data || !data.places) return;
     currentPlacesData = data.places;
 
     const container = document.getElementById("places-grid-container");
-    const exploreTitle = document.getElementById("explore-title");
     if (!container) return;
 
     container.innerHTML = "";
     currentMarkers.forEach((m) => m.remove());
     currentMarkers = [];
 
-    if (data.center) {
+    if (data.center && map) {
         map.flyTo({ center: data.center, zoom: 13.5, pitch: 45, speed: 1.2 });
     }
 
+    const savedPlaces = getSavedPlaces();
+
     data.places.forEach((p, index) => {
         const imgId = `img-place-${index}`;
-        const savedPlaces = JSON.parse(localStorage.getItem("travelai_saved") || "[]");
         const isSaved = savedPlaces.some((item) => item.name === p.name);
-        
         container.innerHTML += `
             <div class="place-card-grid" onclick="openPlaceDetail(${index})">
                 <div class="card-img-box">
@@ -128,20 +158,21 @@ function renderData(data, keyword) {
                         <button onclick="toggleSavePlace(event, ${index}, '${imgId}')">
                             <i class='${isSaved ? "bx bxs-heart" : "bx bx-heart"}' style='${isSaved ? "color: #FF385C;" : "color: #333;"}'></i>
                         </button>
-                        <button><i class='bx bx-plus'></i></button>
                     </div>
                 </div>
                 <div class="card-info-box">
-                    <div class="title-rating"><h3>${p.name}</h3><span>★ ${p.rating}</span></div>
+                    <div class="title-rating"><h3>${p.name}</h3></div>
                     <p class="c-type"><i class='bx bx-map-pin'></i> ${p.type}</p>
                     <p class="c-loc">${p.location}</p>
                 </div>
             </div>`;
 
-        const marker = new mapboxgl.Marker({ color: "#111" })
-            .setLngLat([parseFloat(p.lng), parseFloat(p.lat)])
-            .addTo(map);
-        currentMarkers.push(marker);
+        if (map) {
+            const marker = new mapboxgl.Marker({ color: "#111" })
+                .setLngLat([parseFloat(p.lng), parseFloat(p.lat)])
+                .addTo(map);
+            currentMarkers.push(marker);
+        }
 
         const bulletproofFallback = `https://placehold.co/600x600/eeeeee/333333?text=${encodeURIComponent(p.name.substring(0, 18))}`;
         fetch(`https://vi.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(p.name)}&gsrlimit=1&prop=pageimages&pithumbsize=800&format=json&origin=*`)
@@ -149,11 +180,16 @@ function renderData(data, keyword) {
             .then(wiki => {
                 const pages = wiki?.query?.pages;
                 const imgUrl = pages ? pages[Object.keys(pages)[0]]?.thumbnail?.source : null;
-                document.getElementById(imgId).src = imgUrl || bulletproofFallback;
+                const imgEl = document.getElementById(imgId);
+                if(imgEl) imgEl.src = imgUrl || bulletproofFallback;
             })
-            .catch(() => { document.getElementById(imgId).src = bulletproofFallback; });
+            .catch(() => { 
+                const imgEl = document.getElementById(imgId);
+                if(imgEl) imgEl.src = bulletproofFallback; 
+            });
     });
     
+    const exploreTitle = document.getElementById("explore-title");
     if (exploreTitle) exploreTitle.innerHTML = `Khám phá <i class='bx bx-chevron-down'></i>`;
 }
 
@@ -165,32 +201,36 @@ window.openPlaceDetail = function (index) {
     const wikiContent = document.getElementById("wiki-content");
     const mapEl = document.getElementById("map");
 
-    if (mapEl) {
+    if (overlay && mapEl) {
         overlay.style.width = mapEl.offsetWidth + "px";
         overlay.style.left = mapEl.getBoundingClientRect().left + "px";
+        overlay.style.display = "flex";
     }
-    overlay.style.display = "flex";
 
-    wikiContent.innerHTML = `<h1>${p.name}</h1><div style="text-align: center; padding: 50px;"><i class='bx bx-loader-alt bx-spin' style="font-size: 45px; color: #FF385C;"></i><p>AI đang viết cẩm nang...</p></div>`;
+    if (wikiContent) {
+        wikiContent.innerHTML = `<h1>${p.name}</h1><div style="text-align: center; padding: 50px;"><i class='bx bx-loader-alt bx-spin' style="font-size: 45px; color: #FF385C;"></i><p>AI đang viết cẩm nang...</p></div>`;
+    }
 
-    // Thay link localhost bằng BASE_URL
     fetch(`${BASE_URL}/api/guide`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ place_name: p.name, location: p.location }),
     })
     .then(res => res.json())
-    .then(data => { wikiContent.innerHTML = `<h1>${p.name}</h1>` + data.guide; })
-    .catch(() => { wikiContent.innerHTML = `<h1>${p.name}</h1><p>Không kết nối được server!</p>`; });
+    .then(data => { if(wikiContent) wikiContent.innerHTML = `<h1>${p.name}</h1>` + data.guide; })
+    .catch(() => { if(wikiContent) wikiContent.innerHTML = `<h1>${p.name}</h1><p>Không kết nối được server!</p>`; });
 
-    map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: 16, pitch: 60, speed: 1.5 });
+    if (map) {
+        map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: 16, pitch: 60, speed: 1.5 });
+    }
 };
 
-window.closeWiki = () => { document.getElementById("wiki-overlay").style.display = "none"; };
+window.closeWiki = () => { 
+    const overlay = document.getElementById("wiki-overlay");
+    if(overlay) overlay.style.display = "none"; 
+};
 
-// =============================================================
 // 4. HỆ THỐNG LƯU TRỮ (SAVED PLACES)
-// =============================================================
 
 window.toggleSavePlace = function (event, index, imgId) {
     event.stopPropagation();
@@ -198,29 +238,36 @@ window.toggleSavePlace = function (event, index, imgId) {
 
     const p = currentPlacesData[index];
     const imgSrc = document.getElementById(imgId)?.src || "";
-    let saved = JSON.parse(localStorage.getItem("travelai_saved") || "[]");
+    let saved = getSavedPlaces();
     const idx = saved.findIndex(item => item.name === p.name);
     const icon = event.currentTarget.querySelector("i");
 
     if (idx > -1) {
         saved.splice(idx, 1);
-        icon.className = "bx bx-heart";
-        icon.style.color = "#333";
+        if(icon) {
+            icon.className = "bx bx-heart";
+            icon.style.color = "#333";
+        }
     } else {
         saved.push({ name: p.name, location: p.location, imgSrc: imgSrc });
-        icon.className = "bx bxs-heart";
-        icon.style.color = "#FF385C";
+        if(icon) {
+            icon.className = "bx bxs-heart";
+            icon.style.color = "#FF385C";
+        }
     }
-    localStorage.setItem("travelai_saved", JSON.stringify(saved));
+    setSavedPlaces(saved);
     renderSavedPage();
 };
 
 window.renderSavedPage = function () {
     const container = document.getElementById("saved-container");
     if (!container) return;
+    
     const grid = container.querySelector(".saved-grid");
     const empty = container.querySelector(".empty-state");
-    const saved = JSON.parse(localStorage.getItem("travelai_saved") || "[]");
+    if (!grid || !empty) return;
+
+    const saved = getSavedPlaces();
 
     if (saved.length === 0) {
         empty.style.display = "flex";
@@ -244,18 +291,16 @@ window.renderSavedPage = function () {
 };
 
 window.removeSavedPlace = function (name) {
-    let saved = JSON.parse(localStorage.getItem("travelai_saved") || "[]");
-    saved = saved.filter(item => item.name !== name);
-    localStorage.setItem("travelai_saved", JSON.stringify(saved));
+    let saved = getSavedPlaces().filter(item => item.name !== name);
+    setSavedPlaces(saved);
     renderSavedPage();
 };
 
-// =============================================================
-// 5. KHỞI TẠO HỆ THỐNG (DOM LOADED)
-// =============================================================
+
+// 5. KHỞI TẠO HỆ THỐNG GỘP CHUNG (DOM LOADED)
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // 1. Lấy Config từ BASE_URL
+    // --- 5.1 Khởi tạo Map & Lấy Config ---
     try {
         const configRes = await fetch(`${BASE_URL}/api/config`);
         const configData = await configRes.json();
@@ -264,48 +309,77 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error("Lỗi lấy Token từ server!");
     }
 
-    // 2. Khởi tạo Map
-    map = new mapboxgl.Map({
-        container: "map",
-        style: "mapbox://styles/mapbox/satellite-streets-v12",
-        center: [108.2022, 16.0544],
-        zoom: 12,
-        pitch: 45,
-    });
+    try {
+        map = new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
+            center: [108.2022, 16.0544],
+            zoom: 12,
+            pitch: 45,
+        });
+    } catch (e) {
+        console.log("Map chưa sẵn sàng");
+    }
 
-    // Chuyển Tab
+    // --- 5.2 Xử lý Chuyển Tab ---
     const menuItems = document.querySelectorAll(".nav-menu li");
     menuItems.forEach((item) => {
         item.addEventListener("click", () => {
+            if (item.id === "btn-show-noti") return;
+
             menuItems.forEach((li) => li.classList.remove("active"));
             item.classList.add("active");
-            const targetId = item.dataset.target;
+            
             document.querySelectorAll(".view-section").forEach(v => v.style.display = "none");
-            const targetView = document.getElementById(targetId);
-            if (targetView) {
-                targetView.style.display = "flex";
-                if (targetId === "view-explore") setTimeout(() => map.resize(), 100);
+            
+            const targetId = item.dataset.target;
+            if(targetId) {
+                const targetView = document.getElementById(targetId);
+                if (targetView) {
+                    targetView.style.display = "flex";
+                    if (targetId === "view-explore" && map) {
+                        setTimeout(() => map.resize(), 100);
+                    }
+                }
             }
         });
     });
 
-    // Search API
+    // --- 5.3 Xử Lý Panel Thông Báo---
+    const notiBtn = document.getElementById('btn-show-noti');
+    const notiPanel = document.getElementById('view-notifications-panel');
+
+    if (notiBtn && notiPanel) {
+        notiBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); 
+            
+            const isShowing = notiPanel.style.display === 'flex';
+            notiPanel.style.display = isShowing ? 'none' : 'flex';
+            
+            if(!isShowing) {
+                document.querySelectorAll(".nav-menu li").forEach((li) => li.classList.remove("active"));
+                notiBtn.classList.add('active');
+            } else {
+                notiBtn.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            if (notiPanel.style.display === 'flex' && !notiPanel.contains(event.target) && !notiBtn.contains(event.target)) {
+                notiPanel.style.display = 'none';
+                notiBtn.classList.remove('active');
+            }
+        });
+    }
+
+    // --- 5.4 Xử lý Ô Tìm Kiếm & Nhập Chat ---
     const searchInput = document.getElementById("map-search-input");
     if (searchInput) {
-        searchInput.addEventListener("keypress", async (e) => {
+        searchInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
-                const keyword = e.target.value.trim();
-                if (!keyword) return;
-                document.getElementById("explore-title").innerHTML = `AI đang tìm... <i class='bx bx-loader bx-spin'></i>`;
-                try {
-                    const res = await fetch(`${BASE_URL}/api/search`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ keyword })
-                    });
-                    const data = await res.json();
-                    renderData(data, keyword);
-                } catch (err) { alert("Server đang bận hoặc đang khởi động lại!"); }
+                e.preventDefault(); 
+                window.triggerExploreSearch();
             }
         });
     }
