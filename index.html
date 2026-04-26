@@ -4,29 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TravelAI - Khám phá Việt Nam theo cách của bạn</title>
-    
     <link rel="icon" type="image/png" href="assets/images/travelicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
     <script src="js/app.js" defer></script>
+    <script type="module" src="js/auth.js"></script>
 </head>
 <body>
-
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">TravelAI</div>
-            
+<a href="#" class="logo" onclick="location.reload()">TravelAI</a>
             <ul class="nav-links">
-                <li><a href="frontend/chatai.html?view=view-explore">Điểm đến</a></li>
-                <li><a href="frontend/chatai.html?view=view-suggestions">Gợi ý</a></li>
-                <li><a href="#">Về chúng tôi</a></li>
+                <li><a href="#" onclick="requireAuth('frontend/chatai.html?view=view-explore'); return false;">Điểm đến</a></li>
+                <li><a href="#" onclick="requireAuth('frontend/chatai.html?view=view-suggestions'); return false;">Gợi ý</a></li>
+                <li><a href="about.html">Về chúng tôi</a></li>
             </ul>
-
             <div class="nav-auth">
                 <button id="openLogin" class="btn-login">Đăng nhập</button>
-                <a href="frontend/chatai.html" class="btn-start" >Bắt đầu</a>
+
+                <!-- User menu dropdown-->
+                <div class="user-menu" id="user-menu">
+                    <div class="user-avatar" id="user-avatar" onclick="toggleDropdown()">U</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="dropdown-info">
+                            <div class="dropdown-avatar" id="dropdown-avatar">U</div>
+                            <div>
+                                <div class="dropdown-name" id="user-display-name">Bạn</div>
+                                <div class="dropdown-email" id="user-display-email"></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="profile.html" class="dropdown-item">
+                            <i class="fa-solid fa-circle-user"></i> Thông tin tài khoản
+                        </a>
+                        <a href="#" class="dropdown-item" onclick="openPwPopup(); return false;">
+                            <i class="fa-solid fa-key"></i> Đổi mật khẩu
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" id="btn-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-start" onclick="requireAuth('frontend/chatai.html')">Bắt đầu</button>
             </div>
         </div>
     </nav>
@@ -44,7 +67,7 @@
                     </h2>
                     <p>Khám phá Việt Nam theo cách của riêng bạn!</p>
                     <div class="hero-btns">
-                        <a href="frontend/chatai.html" class="cta-button">Bắt đầu ngay</a>
+                        <button class="cta-button" onclick="requireAuth('frontend/chatai.html')">Bắt đầu ngay</button>
                         <a href="#how-it-works" class="btn-text">Tìm hiểu thêm ➔</a>
                     </div>
                 </div>
@@ -61,7 +84,6 @@
 
         <section id="how-it-works" class="how-it-works">
             <h2 class="section-title">Cách TravelAI hoạt động</h2>
-
             <div class="feature-container">
                 <div class="feature-row">
                     <div class="feature-text">
@@ -72,7 +94,6 @@
                         <img src="assets/images/how-it-works.png" alt="Giao diện trò chuyện AI"> 
                     </div>
                 </div>
-
                 <div class="feature-row reverse">
                     <div class="feature-text">
                         <h3>Địa danh nổi tiếng</h3>
@@ -82,7 +103,6 @@
                         <img src="assets/images/diadanh.png" alt="Các địa danh nổi tiếng">
                     </div>
                 </div>
-
                 <div class="feature-row">
                     <div class="feature-text">
                         <h3>Cá nhân hóa trải nghiệm</h3>
@@ -108,20 +128,303 @@
         </section>
     </main>
 
-    <div id="loginModal" class="modal-overlay">
-        <div class="modal-content">
-            <span id="closeLogin" class="close-btn">&times;</span>
-            <h3>Đăng nhập TravelAI</h3>
-            <form class="login-form">
-                <div class="input-group">
-                    <label for="emailInput">Địa chỉ Email</label>
-                    <input type="email" id="emailInput" placeholder="Email của bạn..." required>
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="auth-overlay">
+        <div class="auth-modal">
+            <button id="closeAuth" class="auth-close" aria-label="Đóng">✕</button>
+            <div class="auth-brand">
+                <div class="auth-brand-icon">✈</div>
+                <span class="auth-brand-name">TravelAI</span>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login">Đăng nhập</div>
+                <div class="auth-tab" id="tab-register">Đăng ký</div>
+            </div>
+
+            <form class="auth-form" id="form-login" novalidate>
+                <div class="field-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="ten@email.com" autocomplete="email" required>
+                    <span class="field-error" id="err-login-email"></span>
                 </div>
-                <p class="terms">Bằng cách tiếp tục, bạn đồng ý với <a href="#">Điều khoản</a> và <a href="#">Chính sách bảo mật</a> của chúng tôi.</p>
-                <button type="submit" id="loginBtn" class="btn-submit">Đăng nhập</button>
+                <div class="field-group">
+                    <label for="login-password">Mật khẩu</label>
+                    <div class="input-pw-wrap">
+                        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+                        <button type="button" class="toggle-pw" onclick="togglePw('login-password', this)">👁</button>
+                    </div>
+                    <span class="field-error" id="err-login-password"></span>
+                </div>
+                <button type="submit" class="btn-auth-submit">Đăng nhập</button>
+                <p class="auth-footer-link">
+                    Chưa có tài khoản? <a href="#" id="link-to-register">Đăng ký ngay</a>
+                </p>
+            </form>
+
+            <form class="auth-form hidden" id="form-register" novalidate>
+                <div class="field-group">
+                    <label for="reg-name">Họ và tên</label>
+                    <input type="text" id="reg-name" placeholder="Nguyễn Văn A" autocomplete="name" required>
+                    <span class="field-error" id="err-reg-name"></span>
+                </div>
+                <div class="field-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" placeholder="ten@email.com" autocomplete="email" required>
+                    <span class="field-error" id="err-reg-email"></span>
+                </div>
+                <div class="field-group">
+                    <label for="reg-password">Mật khẩu</label>
+                    <div class="input-pw-wrap">
+                        <input type="password" id="reg-password" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pw" onclick="togglePw('reg-password', this)">👁</button>
+                    </div>
+                    <span class="field-error" id="err-reg-password"></span>
+                </div>
+                <div class="field-group">
+                    <label for="reg-confirm">Xác nhận mật khẩu</label>
+                    <div class="input-pw-wrap">
+                        <input type="password" id="reg-confirm" placeholder="Nhập lại mật khẩu" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pw" onclick="togglePw('reg-confirm', this)">👁</button>
+                    </div>
+                    <span class="field-error" id="err-reg-confirm"></span>
+                </div>
+                <p class="auth-terms">
+                    Bằng cách đăng ký, bạn đồng ý với <a href="#">Điều khoản</a> và <a href="#">Chính sách bảo mật</a>.
+                </p>
+                <button type="submit" class="btn-auth-submit">Tạo tài khoản</button>
+                <p class="auth-footer-link">
+                    Đã có tài khoản? <a href="#" id="link-to-login">Đăng nhập</a>
+                </p>
             </form>
         </div>
     </div>
+
+    <!--  POPUP ĐỔI MẬT KHẨU  -->
+    <div id="pwPopupOverlay" style="
+      position:fixed; inset:0;
+      background:rgba(5,10,20,0.6);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:2000; padding:16px;
+      opacity:0; pointer-events:none;
+      transition:opacity 0.3s ease;
+    ">
+      <div id="pwPopupModal" style="
+        background:#0f1623;
+        border:1px solid rgba(255,255,255,0.1);
+        border-radius:20px;
+        padding:32px;
+        width:100%; max-width:400px;
+        position:relative;
+        transform:translateY(24px) scale(0.97);
+        opacity:0;
+        transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+        box-shadow:0 32px 80px rgba(0,0,0,0.5);
+      ">
+        
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
+          <div>
+            <div style="
+              width:44px; height:44px; border-radius:12px;
+              background:linear-gradient(135deg,#3b82f6,#6366f1);
+              display:flex; align-items:center; justify-content:center;
+              font-size:1.2rem; margin-bottom:12px;
+            ">🔐</div>
+            <h2 style="font-size:1.15rem; font-weight:700; color:#f0f4ff; letter-spacing:-0.02em;">Đổi mật khẩu</h2>
+            <p style="font-size:0.8rem; color:rgba(240,244,255,0.4); margin-top:4px;">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+          </div>
+          <button onclick="closePwPopup()" style="
+            width:32px; height:32px; border-radius:50%; flex-shrink:0;
+            background:rgba(255,255,255,0.06); border:none;
+            color:rgba(255,255,255,0.5); font-size:1rem;
+            cursor:pointer; display:flex; align-items:center; justify-content:center;
+            transition:background 0.2s;
+          " onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">✕</button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Mật khẩu mới</label>
+            <div id="wrapPwNew" style="
+              display:flex; align-items:center; gap:10px;
+              background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:11px 14px;
+              transition:border-color 0.2s;
+            ">
+              <i class="fa-solid fa-lock" style="color:rgba(255,255,255,0.25); font-size:0.85rem;"></i>
+              <input type="password" id="pwNewInput" placeholder="Tối thiểu 6 ký tự" style="
+                flex:1; background:none; border:none; outline:none;
+                font-size:0.9rem; color:#fff; font-family:inherit;
+              " onfocus="document.getElementById('wrapPwNew').style.borderColor='#3b82f6'"
+                 onblur="document.getElementById('wrapPwNew').style.borderColor='rgba(255,255,255,0.1)'"/>
+              <button type="button" onclick="togglePwPopup('pwNewInput',this)" style="
+                background:none; border:none; cursor:pointer;
+                color:rgba(255,255,255,0.3); font-size:0.9rem; padding:0; flex-shrink:0;
+              ">👁</button>
+            </div>
+            <span id="errPwNew" style="font-size:0.775rem; color:#f87171; min-height:16px;"></span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Xác nhận mật khẩu</label>
+            <div id="wrapPwConfirm" style="
+              display:flex; align-items:center; gap:10px;
+              background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:11px 14px;
+              transition:border-color 0.2s;
+            ">
+              <i class="fa-solid fa-lock" style="color:rgba(255,255,255,0.25); font-size:0.85rem;"></i>
+              <input type="password" id="pwConfirmInput" placeholder="Nhập lại mật khẩu mới" style="
+                flex:1; background:none; border:none; outline:none;
+                font-size:0.9rem; color:#fff; font-family:inherit;
+              " onfocus="document.getElementById('wrapPwConfirm').style.borderColor='#3b82f6'"
+                 onblur="document.getElementById('wrapPwConfirm').style.borderColor='rgba(255,255,255,0.1)'"/>
+              <button type="button" onclick="togglePwPopup('pwConfirmInput',this)" style="
+                background:none; border:none; cursor:pointer;
+                color:rgba(255,255,255,0.3); font-size:0.9rem; padding:0; flex-shrink:0;
+              ">👁</button>
+            </div>
+            <span id="errPwConfirm" style="font-size:0.775rem; color:#f87171; min-height:16px;"></span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px;">
+          <button onclick="closePwPopup()" style="
+            background:none; border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px; padding:10px 20px;
+            font-size:0.875rem; font-weight:600;
+            color:rgba(255,255,255,0.5); cursor:pointer;
+            font-family:inherit; transition:all 0.2s;
+          " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Huỷ</button>
+
+          <button id="btnSavePwPopup" onclick="savePwPopup()" style="
+            display:flex; align-items:center; gap:8px;
+            background:linear-gradient(135deg,#3b82f6,#6366f1);
+            border:none; border-radius:10px; padding:10px 20px;
+            font-size:0.875rem; font-weight:700; color:#fff;
+            cursor:pointer; font-family:inherit;
+            transition:opacity 0.2s, transform 0.15s;
+          " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            <i class="fa-solid fa-floppy-disk"></i> Cập nhật
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        //  Trạng thái login 
+        window._isLoggedIn = false;
+        window._redirectAfterLogin = null;
+
+        function requireAuth(dest) {
+            if (window._isLoggedIn) {
+                window.location.href = dest;
+            } else {
+                window._redirectAfterLogin = dest;
+                document.getElementById("authModal").classList.add("open");
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const show = input.type === "password";
+            input.type = show ? "text" : "password";
+            btn.textContent = show ? "🙈" : "👁";
+        }
+
+        function toggleDropdown() {
+            document.getElementById("user-dropdown").classList.toggle("open");
+        }
+        document.addEventListener("click", (e) => {
+            const menu = document.getElementById("user-menu");
+            const dd   = document.getElementById("user-dropdown");
+            if (dd && !menu?.contains(e.target)) dd.classList.remove("open");
+        });
+
+        // ── Popup đổi mật khẩu ──
+        function openPwPopup() {
+            document.getElementById("user-dropdown").classList.remove("open");
+
+            const overlay = document.getElementById("pwPopupOverlay");
+            const modal   = document.getElementById("pwPopupModal");
+            overlay.style.opacity = "1";
+            overlay.style.pointerEvents = "all";
+            modal.style.opacity = "1";
+            modal.style.transform = "translateY(0) scale(1)";
+            document.body.style.overflow = "hidden";
+        }
+
+        function closePwPopup() {
+            const overlay = document.getElementById("pwPopupOverlay");
+            const modal   = document.getElementById("pwPopupModal");
+            overlay.style.opacity = "0";
+            overlay.style.pointerEvents = "none";
+            modal.style.opacity = "0";
+            modal.style.transform = "translateY(24px) scale(0.97)";
+            document.body.style.overflow = "";
+            // Reset
+            document.getElementById("pwNewInput").value = "";
+            document.getElementById("pwConfirmInput").value = "";
+            document.getElementById("errPwNew").textContent = "";
+            document.getElementById("errPwConfirm").textContent = "";
+        }
+
+        // Đóng khi click ra ngoài
+        document.getElementById("pwPopupOverlay").addEventListener("click", (e) => {
+            if (e.target === document.getElementById("pwPopupOverlay")) closePwPopup();
+        });
+
+        function togglePwPopup(id, btn) {
+            const input = document.getElementById(id);
+            const show = input.type === "password";
+            input.type = show ? "text" : "password";
+            btn.textContent = show ? "🙈" : "👁";
+        }
+
+        async function savePwPopup() {
+            const newPw  = document.getElementById("pwNewInput").value;
+            const confPw = document.getElementById("pwConfirmInput").value;
+            document.getElementById("errPwNew").textContent = "";
+            document.getElementById("errPwConfirm").textContent = "";
+
+            if (newPw.length < 6) {
+                document.getElementById("errPwNew").textContent = "Mật khẩu phải có ít nhất 6 ký tự.";
+                return;
+            }
+            if (newPw !== confPw) {
+                document.getElementById("errPwConfirm").textContent = "Mật khẩu xác nhận không khớp.";
+                return;
+            }
+
+            const btn = document.getElementById("btnSavePwPopup");
+            btn.disabled = true;
+            btn.textContent = "Đang xử lý...";
+
+            try {
+                const { updatePassword } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+                await updatePassword(window._currentUser, newPw);
+                closePwPopup();
+                // Dùng toast của auth.js
+                let toast = document.getElementById("auth-toast");
+                if (!toast) { toast = document.createElement("div"); toast.id = "auth-toast"; document.body.appendChild(toast); }
+                toast.textContent = "Đổi mật khẩu thành công! 🔐";
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3500);
+            } catch (err) {
+                if (err.code === "auth/requires-recent-login") {
+                    document.getElementById("errPwConfirm").textContent = "Phiên hết hạn. Đăng xuất và đăng nhập lại.";
+                } else {
+                    document.getElementById("errPwConfirm").textContent = "Đổi mật khẩu thất bại. Thử lại sau.";
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Cập nhật';
+            }
+        }
+    </script>
 
     <footer class="footer">
         <div class="footer-container">
@@ -130,7 +433,6 @@
                 <a href="#">Bảo mật</a>
                 <a href="#">Điều khoản</a>
             </div>
-
             <div class="footer-right">
                 <a href="https://www.instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                 <a href="https://www.tiktok.com" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
