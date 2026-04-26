@@ -16,7 +16,7 @@
     <div class="app-container">
       
       <aside class="sidebar">
-        <div class="logo">TravelAI</div>
+   <a href="../index.html" class="logo">TravelAI</a>
         <nav class="sidebar-nav">
           <ul class="nav-menu">
             <li class="active" data-target="view-chat">
@@ -43,10 +43,51 @@
           New chat
         </button>
         <footer class="sidebar-footer">
-          <div class="user-profile">
-            <div class="avatar"><i class="bx bxs-user"></i></div>
-            <div class="user-info"><span class="name">Van Huy Bach</span></div>
-            <i class="bx bx-dots-horizontal-rounded more-options"></i>
+          <div class="user-profile" style="position:relative;">
+            <div class="avatar" id="sidebar-avatar"><i class="bx bxs-user"></i></div>
+            <div class="user-info">
+              <span class="name" id="sidebar-name">Đang tải...</span>
+            </div>
+            <i class="bx bx-dots-horizontal-rounded more-options" id="sidebar-more-btn" style="cursor:pointer;" onclick="toggleSidebarMenu(event)"></i>
+
+            <!-- Popup đăng xuất -->
+            <div id="sidebar-user-menu" style="
+              display:none;
+              position:absolute;
+              bottom:52px; left:0; right:0;
+              background:#1a2235;
+              border:1px solid rgba(255,255,255,0.1);
+              border-radius:12px;
+              overflow:hidden;
+              box-shadow:0 -8px 32px rgba(0,0,0,0.4);
+              z-index:100;
+            ">
+              <a href="../profile.html" style="
+                display:flex; align-items:center; gap:10px;
+                padding:12px 16px;
+                color:rgba(255,255,255,0.7);
+                text-decoration:none;
+                font-size:0.875rem;
+                font-weight:500;
+                transition:background 0.15s;
+              " onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
+                <i class="bx bx-user"></i> Thông tin tài khoản
+              </a>
+              <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+              <button id="sidebar-logout-btn" style="
+                display:flex; align-items:center; gap:10px;
+                width:100%; padding:12px 16px;
+                background:none; border:none;
+                color:#f87171;
+                font-size:0.875rem;
+                font-weight:500;
+                cursor:pointer;
+                font-family:inherit;
+                transition:background 0.15s;
+              " onmouseover="this.style.background='rgba(248,113,113,0.08)'" onmouseout="this.style.background='transparent'">
+                <i class="bx bx-log-out"></i> Đăng xuất
+              </button>
+            </div>
           </div>
           <div class="footer-links">
             Company · Contact · Help<br />
@@ -274,5 +315,87 @@
       </div>
     </aside>
 
-  </body>
+  <!-- Firebase Auth: load tên user thật + đăng xuất -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgF4Le5kfzuk8KKeod8HOOIWVOKEuuDtE",
+      authDomain: "travel-ai-cd422.firebaseapp.com",
+      projectId: "travel-ai-cd422",
+      storageBucket: "travel-ai-cd422.firebasestorage.app",
+      messagingSenderId: "88888788030",
+      appId: "1:88888788030:web:e5f4172867f724bc6bfd6f",
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // Theo dõi auth → cập nhật tên + avatar sidebar
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "../index.html";
+        return;
+      }
+
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const data = snap.exists() ? snap.data() : {};
+        const name         = data.name || user.displayName || user.email;
+        const avatarBase64 = data.avatarBase64 || null;
+        const initial      = (name || "U")[0].toUpperCase();
+
+        const sidebarName   = document.getElementById("sidebar-name");
+        const sidebarAvatar = document.getElementById("sidebar-avatar");
+        if (sidebarName) sidebarName.textContent = name || "Bạn";
+
+        if (sidebarAvatar) {
+          // Style chung cho avatar
+          sidebarAvatar.style.cssText = `
+            display:flex; align-items:center; justify-content:center;
+            border-radius:50%; width:36px; height:36px; flex-shrink:0;
+            font-weight:800; font-size:0.95rem; color:#fff;
+            overflow:hidden;
+          `;
+
+          if (avatarBase64) {
+            sidebarAvatar.innerHTML = `<img src="${avatarBase64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+          } else {
+            sidebarAvatar.innerHTML = "";
+            sidebarAvatar.textContent = initial;
+            sidebarAvatar.style.background = "linear-gradient(135deg,#3b82f6,#6366f1)";
+          }
+        }
+      } catch {
+        const sidebarName = document.getElementById("sidebar-name");
+        if (sidebarName) sidebarName.textContent = user.displayName || user.email || "Bạn";
+      }
+    });
+
+    // Đăng xuất
+    document.getElementById("sidebar-logout-btn")?.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "../index.html";
+    });
+  </script>
+
+  <script>
+    // Toggle popup menu khi click 
+    function toggleSidebarMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById("sidebar-user-menu");
+      menu.style.display = menu.style.display === "none" ? "block" : "none";
+    }
+    // Đóng khi click ra ngoài
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("sidebar-user-menu");
+      const btn  = document.getElementById("sidebar-more-btn");
+      if (menu && !btn?.contains(e.target)) menu.style.display = "none";
+    });
+  </script>
+
+</body>
 </html>
