@@ -7,7 +7,7 @@ html, body { height: auto; }
   text-decoration: none;   
   color: inherit;         
   font-weight: 700;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   display: block;
 }
@@ -24,7 +24,6 @@ html, body { height: auto; }
     width: 260px; background: #fff; border-right: 1px solid #eaeaea; 
     display: flex; flex-direction: column; padding: 24px 20px; z-index: 50; flex-shrink: 0;
 }
-.logo { font-size: 22px; font-weight: 700; margin-bottom: 30px; padding-left: 10px; letter-spacing: -0.5px;}
 
 .sidebar-nav { flex: 1; }
 .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
