@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelAI — Thông tin tài khoản</title>
+  <link rel="icon" type="image/png" href="assets/images/travelicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="p-nav">
+    <a href="index.html" class="p-nav-logo">
+      <span class="logo-icon">✈</span> TravelAI
+    </a>
+    <a href="index.html" class="p-nav-back">
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </a>
+  </nav>
+
+  <div class="profile-root">
+
+    <!-- LEFT — Avatar card -->
+    <aside class="avatar-card">
+      <div class="avatar-wrap">
+        <div class="avatar-circle" id="avatarCircle">
+          <span class="avatar-initial" id="avatarInitial">?</span>
+          <img class="avatar-img" id="avatarImg" src="" alt="" />
+        </div>
+        <label class="avatar-edit-btn" for="avatarInput" title="Đổi ảnh">
+          <i class="fa-solid fa-camera"></i>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" hidden />
+      </div>
+      <div class="avatar-name" id="sidebarName">—</div>
+      <div class="avatar-email" id="sidebarEmail">—</div>
+
+      <div class="avatar-stats">
+        <div class="stat-item">
+          <span class="stat-num" id="statTrips">0</span>
+          <span class="stat-label">Chuyến đi</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num" id="statSaved">0</span>
+          <span class="stat-label">Đã lưu</span>
+        </div>
+      </div>
+
+      <div class="join-date" id="joinDate"></div>
+    </aside>
+
+    <!-- RIGHT — Info form -->
+    <main class="info-card">
+      <div class="info-header">
+        <h1>Thông tin tài khoản</h1>
+        <button class="btn-edit" id="btnEdit">
+          <i class="fa-solid fa-pen"></i> Chỉnh sửa
+        </button>
+      </div>
+
+      <form id="profileForm" novalidate>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label>Họ và tên</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="fieldName" placeholder="Nguyễn Văn A" disabled />
+            </div>
+            <span class="field-err" id="errName"></span>
+          </div>
+
+          <div class="field-group">
+            <label>Email</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope"></i>
+              <input type="email" id="fieldEmail" placeholder="email@example.com" disabled />
+            </div>
+            <span class="field-hint">Email không thể thay đổi.</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label>Số điện thoại</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" id="fieldPhone" placeholder="0901 234 567" disabled />
+            </div>
+            <span class="field-err" id="errPhone"></span>
+          </div>
+
+          <div class="field-group">
+            <label>Ngày sinh</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-cake-candles"></i>
+              <input type="date" id="fieldDob" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group full-width">
+          <label>Địa chỉ</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-location-dot"></i>
+            <input type="text" id="fieldAddress" placeholder="123 Đường ABC, Quận 1, TP.HCM" disabled />
+          </div>
+        </div>
+
+        <!-- Action buttons  -->
+        <div class="form-actions hidden" id="formActions">
+          <button type="button" class="btn-cancel" id="btnCancel">Huỷ</button>
+          <button type="submit" class="btn-save" id="btnSave">
+            <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+  <!-- Loading overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signOut, updatePassword
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgF4Le5kfzuk8KKeod8HOOIWVOKEuuDtE",
+      authDomain: "travel-ai-cd422.firebaseapp.com",
+      projectId: "travel-ai-cd422",
+      storageBucket: "travel-ai-cd422.firebasestorage.app",
+      messagingSenderId: "88888788030",
+      appId: "1:88888788030:web:e5f4172867f724bc6bfd6f",
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // ── DOM ──
+    const avatarInitial  = document.getElementById("avatarInitial");
+    const avatarImg      = document.getElementById("avatarImg");
+    const avatarInput    = document.getElementById("avatarInput");
+    const sidebarName    = document.getElementById("sidebarName");
+    const sidebarEmail   = document.getElementById("sidebarEmail");
+    const joinDate       = document.getElementById("joinDate");
+    const statTrips      = document.getElementById("statTrips");
+    const statSaved      = document.getElementById("statSaved");
+    const fieldName      = document.getElementById("fieldName");
+    const fieldEmail     = document.getElementById("fieldEmail");
+    const fieldPhone     = document.getElementById("fieldPhone");
+    const fieldDob       = document.getElementById("fieldDob");
+    const fieldAddress   = document.getElementById("fieldAddress");
+    const btnEdit        = document.getElementById("btnEdit");
+    const btnCancel      = document.getElementById("btnCancel");
+    const formActions    = document.getElementById("formActions");
+    const profileForm    = document.getElementById("profileForm");
+    const toast          = document.getElementById("toast");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    let currentUser = null;
+    let originalData = {};
+
+    // ── Helpers ──
+    function showToast(msg, type = "success") {
+      toast.textContent = msg;
+      toast.className = `toast show ${type}`;
+      setTimeout(() => toast.classList.remove("show"), 3500);
+    }
+    function setLoading(on) {
+      loadingOverlay.classList.toggle("hidden", !on);
+    }
+    function clearErrs() {
+      document.querySelectorAll(".field-err").forEach(e => e.textContent = "");
+    }
+
+    // ── Load profile ──
+    async function loadProfile(user) {
+      currentUser = user;
+      fieldEmail.value = user.email || "";
+      sidebarEmail.textContent = user.email || "";
+
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const data = snap.exists() ? snap.data() : {};
+        originalData = data;
+
+        const name = data.name || user.displayName || "";
+        fieldName.value    = name;
+        fieldPhone.value   = data.phone || "";
+        fieldDob.value     = data.dob || "";
+        fieldAddress.value = data.address || "";
+
+        sidebarName.textContent = name || "Chưa cập nhật";
+        avatarInitial.textContent = (name || "?")[0].toUpperCase();
+
+        statTrips.textContent = (data.trips || []).length;
+        statSaved.textContent = (data.saved || []).length;
+
+        if (data.createdAt?.seconds) {
+          const d = new Date(data.createdAt.seconds * 1000);
+          joinDate.textContent = `Tham gia từ ${d.toLocaleDateString("vi-VN", { month: "long", year: "numeric" })}`;
+        }
+
+        // Avatar ảnh — dùng base64 thay vì Storage URL
+        const avatarSrc = data.avatarBase64 || data.avatarUrl || "";
+        if (avatarSrc) {
+          avatarImg.src = avatarSrc;
+          avatarImg.style.display = "block";
+          avatarInitial.style.display = "none";
+        }
+      } catch (e) {
+        showToast("Không thể tải thông tin.", "error");
+      }
+    }
+
+    // ── Auth state ──
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loadProfile(user);
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    // ── Edit toggle ──
+    const editableFields = [fieldName, fieldPhone, fieldDob, fieldAddress];
+
+    btnEdit.addEventListener("click", () => {
+      editableFields.forEach(f => { f.disabled = false; f.closest(".input-wrap").classList.add("active"); });
+      formActions.classList.remove("hidden");
+      btnEdit.classList.add("hidden");
+    });
+
+    btnCancel.addEventListener("click", () => {
+      fieldName.value    = originalData.name || "";
+      fieldPhone.value   = originalData.phone || "";
+      fieldDob.value     = originalData.dob || "";
+      fieldAddress.value = originalData.address || "";
+      exitEditMode();
+    });
+
+    function exitEditMode() {
+      editableFields.forEach(f => { f.disabled = true; f.closest(".input-wrap").classList.remove("active"); });
+      formActions.classList.add("hidden");
+      btnEdit.classList.remove("hidden");
+      clearErrs();
+    }
+
+    // ── Save profile ──
+    profileForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      clearErrs();
+
+      const name = fieldName.value.trim();
+      if (!name) { document.getElementById("errName").textContent = "Vui lòng nhập tên."; return; }
+
+      const phone = fieldPhone.value.trim();
+      if (phone && !/^[0-9]{9,11}$/.test(phone.replace(/\s/g,""))) {
+        document.getElementById("errPhone").textContent = "Số điện thoại không hợp lệ."; return;
+      }
+
+      setLoading(true);
+      try {
+        await setDoc(doc(db, "users", currentUser.uid), {
+          name,
+          phone:   fieldPhone.value.trim(),
+          dob:     fieldDob.value,
+          address: fieldAddress.value.trim(),
+          email:   currentUser.email,
+          uid:     currentUser.uid,
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+
+        originalData = { ...originalData, name, phone: fieldPhone.value.trim(), dob: fieldDob.value, address: fieldAddress.value.trim() };
+        sidebarName.textContent = name;
+        avatarInitial.textContent = name[0].toUpperCase();
+        exitEditMode();
+        showToast("Cập nhật thông tin thành công! ✅");
+      } catch {
+        showToast("Lưu thất bại, thử lại.", "error");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // ── Upload avatar (base64 → Firestore, không cần Storage) ──
+    avatarInput.addEventListener("change", async e => {
+      const file = e.target.files[0];
+      if (!file || !currentUser) return;
+
+      // giới hạn Firestore document (1MB)
+      if (file.size > 500 * 1024) {
+        showToast("Ảnh tối đa 500KB. Hãy chọn ảnh nhỏ hơn.", "error");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        // Đọc file → resize → base64
+        const base64 = await resizeAndConvertToBase64(file, 200);
+
+        // Lưu thẳng vào Firestore field "avatarBase64"
+        await setDoc(doc(db, "users", currentUser.uid), { avatarBase64: base64 }, { merge: true });
+
+        // Hiển thị ngay không cần reload
+        avatarImg.src = base64;
+        avatarImg.style.display = "block";
+        avatarInitial.style.display = "none";
+        showToast("Cập nhật ảnh đại diện thành công! 🎉");
+      } catch (err) {
+        console.error(err);
+        showToast("Cập nhật ảnh thất bại.", "error");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Helper: resize ảnh về maxSize px rồi trả về base64
+    function resizeAndConvertToBase64(file, maxSize = 200) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let w = img.width, h = img.height;
+            if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+            else        { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+  </script>
+
+    </div>
+  </div>
+
+</body>
+</html>
