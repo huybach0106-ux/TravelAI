@@ -3,14 +3,6 @@
 body { background: #fff; color: #111; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
 html, body { height: auto; } 
-.logo {
-  text-decoration: none;   
-  color: inherit;         
-  font-weight: 700;
-  font-size: 22px;
-  cursor: pointer;
-  display: block;
-}
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
@@ -24,7 +16,17 @@ html, body { height: auto; }
     width: 260px; background: #fff; border-right: 1px solid #eaeaea; 
     display: flex; flex-direction: column; padding: 24px 20px; z-index: 50; flex-shrink: 0;
 }
-
+.logo {
+  text-decoration: none;   
+  color: inherit;         
+  font-weight: 700;
+  font-size: 28px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 30px; 
+  padding-left: 10px;
+   letter-spacing: -0.5px;
+}
 .sidebar-nav { flex: 1; }
 .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
 .nav-menu li {
