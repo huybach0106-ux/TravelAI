@@ -1,0 +1,96 @@
+1. Hệ thống xác thực (Auth)
+Đã chuyển từ localStorage sang Firebase Authentication
+Hỗ trợ:
+	Đăng ký tài khoản (email + password)
+	Đăng nhập / đăng xuất
+	Sau khi đăng nhập:
+		Lưu user vào Firestore (users collection)
+		Cập nhật UI navbar (ẩn nút login, hiện avatar + dropdown)
+Có route guard (requireAuth):
+	Nếu chưa login → mở modal
+	Nếu login rồi → cho truy cập trang protected
+2. Modal đăng nhập / đăng ký
+Thiết kế modal hiện đại
+Có tab chuyển:
+	Đăng nhập ↔ Đăng ký
+Validate đầy đủ:
+	Email hợp lệ
+	Password ≥ 6 ký tự
+	Confirm password đúng
+Mapping lỗi Firebase → tiếng Việt rõ ràng
+3. Dropdown user + Navbar động
+Sau login:
+Hiển thị avatar + tên + email
+Dropdown gồm:
+	Thông tin tài khoản
+	Đổi mật khẩu
+	Đăng xuất
+Tự đóng dropdown khi click ra ngoài
+4. Đổi mật khẩu 
+Tạo popup custom 
+Gồm 3 field:
+	Mật khẩu hiện tại
+	Mật khẩu mới
+	Xác nhận mật khẩu
+Validate:
+	Không trống
+	≥ 6 ký tự
+	Không trùng mật khẩu cũ
+Bảo mật:
+	Dùng reauthenticateWithCredential trước khi đổi
+5. Trang Profile (quản lý tài khoản)
+Hiển thị:
+Tên, email, SĐT, ngày sinh, địa chỉ
+	Có chế độ:
+		View → Edit → Save / Cancel
+Validate:
+	Tên bắt buộc
+	SĐT đúng format
+	Lưu dữ liệu vào Firestore bằng setDoc merge
+6. Upload Avatar
+Cách làm:
+	Upload ảnh từ máy
+	Resize về 200x200 bằng Canvas
+	Convert → base64
+	Lưu vào Firestore (avatarBase64)
+Đồng bộ:
+	Navbar avatar
+	Dropdown avatar
+	Sidebar profile
+7. Đồng bộ trạng thái user
+Dùng onAuthStateChanged:
+Khi login:
+	Set _isLoggedIn = true
+	Load avatar + name từ Firestore
+Khi logout:
+	Reset UI về trạng thái ban đầu
+8. Cải tiến UX/UI
+Animation:
+	Hero text rotation (word switching)
+	Modal + popup:
+Toast notification:
+	Login success
+	Update success
+	Error
+9. Bảo mật & logic
+Không lưu password ở frontend
+Không cho vào trang chat nếu chưa login
+Token + auth xử lý bởi Firebase
+Có cơ chế:
+redirect sau login (_redirectAfterLogin)
+10. Thêm trang Về chúng tôi
+
+Áp dụng công nghệ mới
+Firebase (Công nghệ chính mới)
+Sử dụng Firebase Authentication
+-Đăng ký / đăng nhập bằng Email & Password
+-Quản lý session người dùng (auto login)
+-Sử dụng Cloud Firestore
+-Lưu thông tin user:
+	name, email, uid
+	avatarBase64
+	phone, dob, address
+2. Canvas API (xử lý ảnh avatar)
+-Resize ảnh client-side (200x200)
+-Convert ảnh → base64
+-Lưu trực tiếp vào Firestore
