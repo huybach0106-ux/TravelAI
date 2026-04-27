@@ -1,18 +1,27 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #080d18;
-  --surface:   #0f1623;
-  --surface2:  #161f30;
-  --border:    rgba(255,255,255,0.08);
-  --accent:    #3b82f6;
-  --accent2:   #6366f1;
-  --text:      #f0f4ff;
-  --text2:     rgba(240,244,255,0.5);
-  --text3:     rgba(240,244,255,0.25);
-  --danger:    #f87171;
-  --success:   #34d399;
-  --radius:    16px;
+  /* Nền trang và bề mặt box */
+  --bg:           #f0f2f5; /* Màu nền nhẹ của Facebook/Google giúp các box trắng nổi bật */
+  --surface:      #ffffff; /* Trắng tinh cho các box */
+  --surface2:     #dde5ed; /* Xám cực nhẹ cho nền input */
+  
+  /* Đường viền và Đổ bóng */
+  --border:       #e2e8f0; 
+  --shadow:       0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  
+  /* Màu chủ đạo (Xanh dương đậm hơn cho nền trắng) */
+  --accent:       #2563eb; 
+  --accent2:      #4f46e5;
+  
+  /* Màu chữ (Tương phản cao) */
+  --text:         #1e293b; /* Màu xanh đen Slate đậm, cực kỳ rõ nét */
+  --text2:        #475569; /* Xám đậm cho các đoạn mô tả */
+  --text3:        #b8c5d8; /* Xám nhạt cho label và icon phụ */
+  
+  --danger:       #ef4444;
+  --success:      #10b981;
+  --radius:       12px; /* Bo góc nhẹ nhàng hiện đại */
 }
 
 body {
@@ -30,7 +39,7 @@ body {
   justify-content: space-between;
   padding: 16px 32px;
   border-bottom: 1px solid var(--border);
-  background: rgba(8,13,24,0.85);
+  background: #f0f2f5;
   backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
