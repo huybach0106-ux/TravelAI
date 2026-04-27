@@ -16,6 +16,7 @@ html, body { height: auto; }
     width: 260px; background: #fff; border-right: 1px solid #eaeaea; 
     display: flex; flex-direction: column; padding: 24px 20px; z-index: 50; flex-shrink: 0;
 }
+
 .logo {
   text-decoration: none;   
   color: inherit;         
