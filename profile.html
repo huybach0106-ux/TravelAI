@@ -23,7 +23,6 @@
 
   <div class="profile-root">
 
-    <!-- LEFT — Avatar card -->
     <aside class="avatar-card">
       <div class="avatar-wrap">
         <div class="avatar-circle" id="avatarCircle">
@@ -61,9 +60,7 @@
           <i class="fa-solid fa-pen"></i> Chỉnh sửa
         </button>
       </div>
-
       <form id="profileForm" novalidate>
-
         <div class="field-row">
           <div class="field-group">
             <label>Họ và tên</label>
@@ -110,8 +107,6 @@
             <input type="text" id="fieldAddress" placeholder="123 Đường ABC, Quận 1, TP.HCM" disabled />
           </div>
         </div>
-
-        <!-- Action buttons  -->
         <div class="form-actions hidden" id="formActions">
           <button type="button" class="btn-cancel" id="btnCancel">Huỷ</button>
           <button type="submit" class="btn-save" id="btnSave">
@@ -120,11 +115,13 @@
         </div>
 
       </form>
+
     </main>
   </div>
 
   <!-- Toast -->
   <div id="toast" class="toast"></div>
+
   <!-- Loading overlay -->
   <div class="loading-overlay hidden" id="loadingOverlay">
     <div class="spinner"></div>
@@ -133,7 +130,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-      getAuth, onAuthStateChanged, signOut, updatePassword
+      getAuth, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, serverTimestamp
@@ -148,7 +145,7 @@
       appId: "1:88888788030:web:e5f4172867f724bc6bfd6f",
     };
 
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
@@ -176,7 +173,6 @@
     let currentUser = null;
     let originalData = {};
 
-    // ── Helpers ──
     function showToast(msg, type = "success") {
       toast.textContent = msg;
       toast.className = `toast show ${type}`;
@@ -188,6 +184,12 @@
     function clearErrs() {
       document.querySelectorAll(".field-err").forEach(e => e.textContent = "");
     }
+    window.togglePw = (id, btn) => {
+      const inp = document.getElementById(id);
+      const show = inp.type === "password";
+      inp.type = show ? "text" : "password";
+      btn.textContent = show ? "🙈" : "👁";
+    };
 
     // ── Load profile ──
     async function loadProfile(user) {
@@ -216,8 +218,6 @@
           const d = new Date(data.createdAt.seconds * 1000);
           joinDate.textContent = `Tham gia từ ${d.toLocaleDateString("vi-VN", { month: "long", year: "numeric" })}`;
         }
-
-        // Avatar ảnh — dùng base64 thay vì Storage URL
         const avatarSrc = data.avatarBase64 || data.avatarUrl || "";
         if (avatarSrc) {
           avatarImg.src = avatarSrc;
@@ -291,7 +291,7 @@
         sidebarName.textContent = name;
         avatarInitial.textContent = name[0].toUpperCase();
         exitEditMode();
-        showToast("Cập nhật thông tin thành công! ✅");
+        showToast("Cập nhật thông tin thành công! ");
       } catch {
         showToast("Lưu thất bại, thử lại.", "error");
       } finally {
@@ -299,26 +299,20 @@
       }
     });
 
-    // ── Upload avatar (base64 → Firestore, không cần Storage) ──
+    // ── Upload avatar (base64 → Firestore) ──
     avatarInput.addEventListener("change", async e => {
       const file = e.target.files[0];
       if (!file || !currentUser) return;
 
-      // giới hạn Firestore document (1MB)
       if (file.size > 500 * 1024) {
-        showToast("Ảnh tối đa 500KB. Hãy chọn ảnh nhỏ hơn.", "error");
+        showToast("Ảnh tối đa 500KB.", "error");
         return;
       }
 
       setLoading(true);
       try {
-        // Đọc file → resize → base64
         const base64 = await resizeAndConvertToBase64(file, 200);
-
-        // Lưu thẳng vào Firestore field "avatarBase64"
         await setDoc(doc(db, "users", currentUser.uid), { avatarBase64: base64 }, { merge: true });
-
-        // Hiển thị ngay không cần reload
         avatarImg.src = base64;
         avatarImg.style.display = "block";
         avatarInitial.style.display = "none";
@@ -331,7 +325,6 @@
       }
     });
 
-    // Helper: resize ảnh về maxSize px rồi trả về base64
     function resizeAndConvertToBase64(file, maxSize = 200) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -353,11 +346,6 @@
         reader.readAsDataURL(file);
       });
     }
-
   </script>
-
-    </div>
-  </div>
-
 </body>
 </html>
