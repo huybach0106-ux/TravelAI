@@ -15,16 +15,15 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-<a href="#" class="logo" onclick="location.reload()">TravelAI</a>
-            <ul class="nav-links">
+            <a href="#" class="logo" onclick="location.reload()">TravelAI</a>            
+            <ul class="nav-links" id="nav-links">
                 <li><a href="#" onclick="requireAuth('frontend/chatai.html?view=view-explore'); return false;">Điểm đến</a></li>
                 <li><a href="#" onclick="requireAuth('frontend/chatai.html?view=view-suggestions'); return false;">Gợi ý</a></li>
                 <li><a href="about.html">Về chúng tôi</a></li>
             </ul>
             <div class="nav-auth">
                 <button id="openLogin" class="btn-login">Đăng nhập</button>
-
-                <!-- User menu dropdown-->
+ <!-- User menu dropdown  -->
                 <div class="user-menu" id="user-menu">
                     <div class="user-avatar" id="user-avatar" onclick="toggleDropdown()">U</div>
                     <div class="user-dropdown" id="user-dropdown">
@@ -71,7 +70,6 @@
                         <a href="#how-it-works" class="btn-text">Tìm hiểu thêm ➔</a>
                     </div>
                 </div>
-
                 <div class="hero-right">
                     <div class="image-grid">
                         <img src="assets/images/ha-long.jpg" class="grid-img img-large" alt="Vịnh Hạ Long">
@@ -114,7 +112,6 @@
                 </div>
             </div>
         </section>
-
         <section class="app-promo">
             <div class="promo-container">
                 <div class="promo-content">
@@ -199,7 +196,7 @@
         </div>
     </div>
 
-    <!--  POPUP ĐỔI MẬT KHẨU  -->
+    <!-- ── POPUP ĐỔI MẬT KHẨU ── -->
     <div id="pwPopupOverlay" style="
       position:fixed; inset:0;
       background:rgba(5,10,20,0.6);
@@ -222,7 +219,7 @@
         transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
         box-shadow:0 32px 80px rgba(0,0,0,0.5);
       ">
-        
+        <!-- Header -->
         <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
           <div>
             <div style="
@@ -243,14 +240,36 @@
           " onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">✕</button>
         </div>
 
+        <!-- Fields -->
         <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Mật khẩu hiện tại</label>
+            <div id="wrapPwCurrent" style="
+              display:flex; align-items:center; gap:10px;
+              background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:11px 14px; transition:border-color 0.2s;
+            ">
+              <i class="fa-solid fa-lock" style="color:rgba(255,255,255,0.25); font-size:0.85rem;"></i>
+              <input type="password" id="pwCurrentInput" placeholder="Nhập mật khẩu hiện tại" style="
+                flex:1; background:none; border:none; outline:none;
+                font-size:0.9rem; color:#fff; font-family:inherit;
+              " onfocus="document.getElementById('wrapPwCurrent').style.borderColor='#3b82f6'"
+                 onblur="document.getElementById('wrapPwCurrent').style.borderColor='rgba(255,255,255,0.1)'"/>
+              <button type="button" onclick="togglePwPopup('pwCurrentInput',this)" style="
+                background:none; border:none; cursor:pointer;
+                color:rgba(255,255,255,0.3); font-size:0.9rem; padding:0; flex-shrink:0;
+              ">👁</button>
+            </div>
+            <span id="errPwCurrent" style="font-size:0.775rem; color:#f87171; min-height:16px;"></span>
+          </div>
+          <div style="height:1px; background:rgba(255,255,255,0.07);"></div>
+
           <div style="display:flex; flex-direction:column; gap:6px;">
             <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Mật khẩu mới</label>
             <div id="wrapPwNew" style="
               display:flex; align-items:center; gap:10px;
               background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-              border-radius:10px; padding:11px 14px;
-              transition:border-color 0.2s;
+              border-radius:10px; padding:11px 14px; transition:border-color 0.2s;
             ">
               <i class="fa-solid fa-lock" style="color:rgba(255,255,255,0.25); font-size:0.85rem;"></i>
               <input type="password" id="pwNewInput" placeholder="Tối thiểu 6 ký tự" style="
@@ -267,12 +286,11 @@
           </div>
 
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Xác nhận mật khẩu</label>
+            <label style="font-size:0.75rem; font-weight:700; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.07em;">Xác nhận mật khẩu mới</label>
             <div id="wrapPwConfirm" style="
               display:flex; align-items:center; gap:10px;
               background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-              border-radius:10px; padding:11px 14px;
-              transition:border-color 0.2s;
+              border-radius:10px; padding:11px 14px; transition:border-color 0.2s;
             ">
               <i class="fa-solid fa-lock" style="color:rgba(255,255,255,0.25); font-size:0.85rem;"></i>
               <input type="password" id="pwConfirmInput" placeholder="Nhập lại mật khẩu mới" style="
@@ -288,8 +306,7 @@
             <span id="errPwConfirm" style="font-size:0.775rem; color:#f87171; min-height:16px;"></span>
           </div>
         </div>
-
-        <!-- Actions -->
+   <!-- Actions -->
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px;">
           <button onclick="closePwPopup()" style="
             background:none; border:1px solid rgba(255,255,255,0.1);
@@ -312,9 +329,27 @@
         </div>
       </div>
     </div>
-
     <script>
-        //  Trạng thái login 
+        // ── Mobile menu ──
+        function toggleMobileMenu() {
+            const menu = document.getElementById("mobile-menu");
+            const ham  = document.getElementById("hamburger");
+            menu.classList.toggle("open");
+            ham.classList.toggle("active");
+        }
+        function closeMobileMenu() {
+            document.getElementById("mobile-menu")?.classList.remove("open");
+            document.getElementById("hamburger")?.classList.remove("active");
+        }
+        document.addEventListener("click", (e) => {
+            const menu = document.getElementById("mobile-menu");
+            const ham  = document.getElementById("hamburger");
+            if (menu?.classList.contains("open") && !menu.contains(e.target) && !ham?.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        // ── Trạng thái login──
         window._isLoggedIn = false;
         window._redirectAfterLogin = null;
 
@@ -327,7 +362,6 @@
                 document.body.style.overflow = "hidden";
             }
         }
-
         function togglePw(inputId, btn) {
             const input = document.getElementById(inputId);
             const show = input.type === "password";
@@ -344,7 +378,6 @@
             if (dd && !menu?.contains(e.target)) dd.classList.remove("open");
         });
 
-        // ── Popup đổi mật khẩu ──
         function openPwPopup() {
             document.getElementById("user-dropdown").classList.remove("open");
 
@@ -365,9 +398,11 @@
             modal.style.opacity = "0";
             modal.style.transform = "translateY(24px) scale(0.97)";
             document.body.style.overflow = "";
-            // Reset
+
+            document.getElementById("pwCurrentInput").value = "";
             document.getElementById("pwNewInput").value = "";
             document.getElementById("pwConfirmInput").value = "";
+            document.getElementById("errPwCurrent").textContent = "";
             document.getElementById("errPwNew").textContent = "";
             document.getElementById("errPwConfirm").textContent = "";
         }
@@ -385,17 +420,30 @@
         }
 
         async function savePwPopup() {
-            const newPw  = document.getElementById("pwNewInput").value;
-            const confPw = document.getElementById("pwConfirmInput").value;
+            const currentPw = document.getElementById("pwCurrentInput").value;
+            const newPw     = document.getElementById("pwNewInput").value;
+            const confPw    = document.getElementById("pwConfirmInput").value;
+
+            // Reset lỗi
+            document.getElementById("errPwCurrent").textContent = "";
             document.getElementById("errPwNew").textContent = "";
             document.getElementById("errPwConfirm").textContent = "";
 
+            // Validate
+            if (!currentPw) {
+                document.getElementById("errPwCurrent").textContent = "Vui lòng nhập mật khẩu hiện tại.";
+                return;
+            }
             if (newPw.length < 6) {
-                document.getElementById("errPwNew").textContent = "Mật khẩu phải có ít nhất 6 ký tự.";
+                document.getElementById("errPwNew").textContent = "Mật khẩu mới phải có ít nhất 6 ký tự.";
                 return;
             }
             if (newPw !== confPw) {
                 document.getElementById("errPwConfirm").textContent = "Mật khẩu xác nhận không khớp.";
+                return;
+            }
+            if (currentPw === newPw) {
+                document.getElementById("errPwNew").textContent = "Mật khẩu mới phải khác mật khẩu hiện tại.";
                 return;
             }
 
@@ -404,18 +452,27 @@
             btn.textContent = "Đang xử lý...";
 
             try {
-                const { updatePassword } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+                const { updatePassword, EmailAuthProvider, reauthenticateWithCredential }
+                    = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+
+                const credential = EmailAuthProvider.credential(
+                    window._currentUser.email,
+                    currentPw
+                );
+                await reauthenticateWithCredential(window._currentUser, credential);
                 await updatePassword(window._currentUser, newPw);
                 closePwPopup();
-                // Dùng toast của auth.js
+                // Toast thông báo
                 let toast = document.getElementById("auth-toast");
                 if (!toast) { toast = document.createElement("div"); toast.id = "auth-toast"; document.body.appendChild(toast); }
                 toast.textContent = "Đổi mật khẩu thành công! 🔐";
                 toast.classList.add("show");
                 setTimeout(() => toast.classList.remove("show"), 3500);
             } catch (err) {
-                if (err.code === "auth/requires-recent-login") {
-                    document.getElementById("errPwConfirm").textContent = "Phiên hết hạn. Đăng xuất và đăng nhập lại.";
+                if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+                    document.getElementById("errPwCurrent").textContent = "Mật khẩu hiện tại không đúng.";
+                } else if (err.code === "auth/requires-recent-login") {
+                    document.getElementById("errPwCurrent").textContent = "Phiên hết hạn. Đăng xuất và đăng nhập lại.";
                 } else {
                     document.getElementById("errPwConfirm").textContent = "Đổi mật khẩu thất bại. Thử lại sau.";
                 }
@@ -443,6 +500,5 @@
             </div>
         </div>
     </footer>
-
 </body>
 </html>
