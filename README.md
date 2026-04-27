@@ -72,7 +72,9 @@ Giao diện ứng dụng được chia thành thanh điều hướng bên trái 
 + Cập nhật thông tin: Người dùng có thể chỉnh sửa Họ tên, Số điện thoại, Ngày sinh và Địa chỉ; dữ liệu được đồng bộ trực tiếp lên Cloud Firestore.
 + Ảnh đại diện thông minh: Hỗ trợ tải ảnh lên từ thiết bị. Hệ thống sử dụng Canvas API để tự động resize ảnh về kích thước 200 x 200 và chuyển đổi sang định dạng Base64 giúp tối ưu tốc độ tải trang và dung lượng lưu trữ.
 + Đồng bộ hóa giao diện: Ảnh đại diện và tên người dùng được cập nhật ngay lập tức trên Navbar và Menu sau khi thay đổi thành công.
-🛠 Công nghệ sử dụng
+
+🛠 Công nghệ sử dụng:
+
 Authentication & Database: Firebase (Auth & Firestore)
 
 Image Processing: Canvas API
