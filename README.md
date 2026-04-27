@@ -60,7 +60,23 @@ Giao diện ứng dụng được chia thành thanh điều hướng bên trái 
 - Nơi tìm kiếm cảm hứng cho chuyến đi tiếp theo.
 - Chiêm ngưỡng dải ảnh chạy ngang (Marquee) tuyệt đẹp về phong cảnh Việt Nam. Di chuột vào dải ảnh để tạm dừng và ngắm nhìn kỹ hơn.
 - Nhấn **"Tìm hiểu cùng AI"** để bắt đầu lên kế hoạch cho một cẩm nang du lịch mới.
+
+### 7. 🔐 Hệ thống xác thực & Bảo mật (Auth & Security)
+- Hệ thống đã được nâng cấp lưu trữ trên nền tảng Firebase Authentication, đảm bảo tính bảo mật và ổn định:
++ Đăng ký/Đăng nhập: Người dùng có thể tạo tài khoản bằng Email và mật khẩu với quy trình kiểm tra dữ liệu đầu vào (Validation) chặt chẽ.
++ Quản lý phiên: Trạng thái đăng nhập được duy trì tự động giúp người dùng không phải đăng nhập lại nhiều lần.
++ Đổi mật khẩu: Tính năng đổi mật khẩu an toàn với cơ chế xác thực lại tài khoản (Re-authentication) trước khi thực hiện thay đổi.
+
+### 8. 👤 Quản lý thông tin cá nhân (Profile Management)
+- Trang hồ sơ người dùng cho phép cá nhân hóa trải nghiệm sâu sắc:
++ Cập nhật thông tin: Người dùng có thể chỉnh sửa Họ tên, Số điện thoại, Ngày sinh và Địa chỉ; dữ liệu được đồng bộ trực tiếp lên Cloud Firestore.
++ Ảnh đại diện thông minh: Hỗ trợ tải ảnh lên từ thiết bị. Hệ thống sử dụng Canvas API để tự động resize ảnh về kích thước 200 x 200 và chuyển đổi sang định dạng Base64 giúp tối ưu tốc độ tải trang và dung lượng lưu trữ.
++ Đồng bộ hóa giao diện: Ảnh đại diện và tên người dùng được cập nhật ngay lập tức trên Navbar và Menu sau khi thay đổi thành công.
 🛠 Công nghệ sử dụng
+Authentication & Database: Firebase (Auth & Firestore)
+
+Image Processing: Canvas API
+
 Frontend: HTML5, CSS3 (Flexbox, CSS Grid, Keyframes Animation), JavaScript (ES6+).
 
 Maps: Mapbox GL JS (Hiển thị bản đồ vệ tinh 3D).
@@ -82,3 +98,4 @@ Dự án được hoàn thiện nhờ sự hỗ trợ từ các tài nguyên và
     * [Google Fonts (Inter)](https://fonts.google.com/specimen/Inter) - Font chữ chủ đạo giúp tối ưu khả năng đọc trên UI/UX.
 * **Công cụ phát triển (Development Tools):**
     * [VS Code Live Server Extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) - Môi trường chạy thử nghiệm dự án Localhost.
+
